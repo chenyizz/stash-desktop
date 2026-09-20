@@ -1,4 +1,4 @@
-module Case
+module case
 
 go 1.25.0
 
