@@ -1,0 +1,13 @@
+{
+  "go.useLanguageServer": true,
+  "go.lintTool": "golangci-lint",
+  "go.lintOnSave": "workspace",
+  "editor.formatOnSave": true,
+  "go.formatTool": "goimports",
+  "eslint.validate": ["javascript", "typescript", "svelte"],
+  "prettier.documentSelectors": ["**/*.svelte"],
+  "[svelte]": {
+    "editor.defaultFormatter": "svelte.svelte-vscode"
+  },
+  "svelte.plugin.svelte.format.enable": true
+}

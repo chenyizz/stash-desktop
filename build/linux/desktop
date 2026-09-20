@@ -1,0 +1,13 @@
+[Desktop Entry]
+Version=1.0
+Name=My Product
+Comment=A stash-desktop application
+# The Exec line includes %u to pass the URL to the application
+Exec=/usr/local/bin/stash-desktop.exe %u
+Terminal=false
+Type=Application
+Icon=stash-desktop.exe
+Categories=Utility;
+StartupWMClass=stash-desktop.exe
+
+ 
