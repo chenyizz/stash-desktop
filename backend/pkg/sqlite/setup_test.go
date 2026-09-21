@@ -15,7 +15,7 @@ import (
 	"testing"
 	"time"
 
-	"case/backend/internal/manager/config"
+	"case/backend/manager/config"
 	"case/backend/pkg/models"
 	"case/backend/pkg/sqlite"
 	"case/backend/pkg/txn"

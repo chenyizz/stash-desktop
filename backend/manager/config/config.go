@@ -23,7 +23,7 @@ import (
 	"github.com/knadh/koanf/providers/file"
 	"github.com/knadh/koanf/v2"
 
-	"case/backend/internal/identify"
+	// "case/backend/internal/identify"
 	"case/backend/pkg/fsutil"
 	"case/backend/pkg/hash"
 	"case/backend/pkg/logger"
@@ -295,8 +295,8 @@ const (
 	defaultLogFileMaxSize = 0 // megabytes, default disabled
 
 	// Default settings
-	DefaultScanSettings     = "defaults.scan_task"
-	DefaultIdentifySettings = "defaults.identify_task"
+	DefaultScanSettings = "defaults.scan_task"
+	// DefaultIdentifySettings = "defaults.identify_task"
 	DefaultAutoTagSettings  = "defaults.auto_tag_task"
 	DefaultGenerateSettings = "defaults.generate_task"
 
@@ -1654,22 +1654,22 @@ func (i *Config) SetDeleteTrashPath(value string) {
 // GetDefaultIdentifySettings returns the default Identify task settings.
 // Returns nil if the settings could not be unmarshalled, or if it
 // has not been set.
-func (i *Config) GetDefaultIdentifySettings() *identify.Options {
-	i.RLock()
-	defer i.RUnlock()
-	v := i.forKey(DefaultIdentifySettings)
+// func (i *Config) GetDefaultIdentifySettings() *identify.Options {
+// 	i.RLock()
+// 	defer i.RUnlock()
+// 	v := i.forKey(DefaultIdentifySettings)
 
-	if v.Exists(DefaultIdentifySettings) && v.Get(DefaultIdentifySettings) != nil {
-		var ret identify.Options
+// 	if v.Exists(DefaultIdentifySettings) && v.Get(DefaultIdentifySettings) != nil {
+// 		var ret identify.Options
 
-		if err := v.Unmarshal(DefaultIdentifySettings, &ret); err != nil {
-			return nil
-		}
-		return &ret
-	}
+// 		if err := v.Unmarshal(DefaultIdentifySettings, &ret); err != nil {
+// 			return nil
+// 		}
+// 		return &ret
+// 	}
 
-	return nil
-}
+// 	return nil
+// }
 
 // GetDefaultScanSettings returns the default Scan task settings.
 // Returns nil if the settings could not be unmarshalled, or if it

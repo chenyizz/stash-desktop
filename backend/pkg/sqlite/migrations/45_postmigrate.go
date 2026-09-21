@@ -5,12 +5,13 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/jmoiron/sqlx"
-	"case/backend/internal/manager/config"
+	"case/backend/manager/config"
 	"case/backend/pkg/hash/md5"
 	"case/backend/pkg/logger"
 	"case/backend/pkg/sqlite"
 	"case/backend/pkg/utils"
+
+	"github.com/jmoiron/sqlx"
 )
 
 type schema45Migrator struct {

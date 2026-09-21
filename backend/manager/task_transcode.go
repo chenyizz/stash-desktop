@@ -4,7 +4,7 @@ import (
 	"context"
 	"fmt"
 
-	"case/backend/internal/manager/config"
+	"case/backend/manager/config"
 	"case/backend/pkg/ffmpeg"
 	"case/backend/pkg/logger"
 	"case/backend/pkg/models"

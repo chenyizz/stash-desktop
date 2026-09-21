@@ -7,7 +7,6 @@ import (
 	"net/http"
 	"path/filepath"
 
-	"case/backend/internal/static"
 	"case/backend/manager/config"
 	"case/backend/pkg/ffmpeg"
 	"case/backend/pkg/fsutil"
@@ -95,7 +94,6 @@ func (s *SceneServer) ServeScreenshot(scene *models.Scene, w http.ResponseWriter
 		}
 
 		// fallback to default cover if none found
-		cover = static.ReadAll(static.DefaultSceneImage)
 	}
 
 	utils.ServeImage(w, r, cover)

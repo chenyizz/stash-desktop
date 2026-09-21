@@ -6,10 +6,11 @@ import (
 	"os"
 	"time"
 
-	"github.com/jmoiron/sqlx"
-	"case/backend/internal/manager/config"
+	"case/backend/manager/config"
 	"case/backend/pkg/logger"
 	"case/backend/pkg/sqlite"
+
+	"github.com/jmoiron/sqlx"
 )
 
 type schema65Migrator struct {

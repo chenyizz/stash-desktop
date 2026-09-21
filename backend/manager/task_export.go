@@ -13,7 +13,7 @@ import (
 	"sync"
 	"time"
 
-	"case/backend/internal/manager/config"
+	"case/backend/manager/config"
 	"case/backend/pkg/fsutil"
 	"case/backend/pkg/gallery"
 	"case/backend/pkg/group"

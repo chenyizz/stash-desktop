@@ -7,7 +7,7 @@ import (
 	"path/filepath"
 	"time"
 
-	"case/backend/internal/manager/config"
+	"case/backend/manager/config"
 	"case/backend/pkg/file"
 	"case/backend/pkg/fsutil"
 	"case/backend/pkg/image"

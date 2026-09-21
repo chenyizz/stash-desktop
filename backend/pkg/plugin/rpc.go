@@ -9,6 +9,8 @@ import (
 	"sync"
 
 	"github.com/natefinch/pie"
+
+	"case/backend/pkg/logger"
 	"case/backend/pkg/plugin/common"
 )
 
@@ -64,7 +66,12 @@ func (t *rpcPluginTask) Start() error {
 		return err
 	}
 
-	go t.handlePluginStderr(t.plugin.Name, pluginErrReader)
+	// 用统一的 PluginLogger 处理 stderr
+	pluginLogger := &logger.PluginLogger{
+		Logger: logger.Logger,
+		Prefix: "[" + t.plugin.Name + "] ",
+	}
+	go pluginLogger.ReadLogMessages(pluginErrReader)
 
 	iface := rpcPluginClient{
 		Client: t.client,

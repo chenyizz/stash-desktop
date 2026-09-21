@@ -6,15 +6,14 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"log/slog"
 	"net/http"
 	"os"
 	"path/filepath"
 	"runtime"
 	"time"
 
-	"case/backend/internal/dlna"
-	"case/backend/internal/log"
-	"case/backend/internal/manager/config"
+	"case/backend/manager/config"
 	"case/backend/pkg/ffmpeg"
 	"case/backend/pkg/fsutil"
 	"case/backend/pkg/job"
@@ -35,7 +34,7 @@ import (
 
 type Manager struct {
 	Config *config.Config
-	Logger *log.Logger
+	Logger *slog.Logger
 
 	// ImageThumbnailGenerateWaitGroup is the global wait group image thumbnail generation
 	// It uses the parallel tasks setting from the configuration.
@@ -59,7 +58,7 @@ type Manager struct {
 	PluginPackageManager  *pkg.Manager
 	ScraperPackageManager *pkg.Manager
 
-	DLNAService *dlna.Service
+	// DLNAService 已移除 - Wails 桌面版不需要 DLNA
 
 	Database   *sqlite.Database
 	Repository models.Repository
@@ -147,18 +146,7 @@ func (s *Manager) RefreshStreamManager() {
 	s.StreamManager = ffmpeg.NewStreamManager(cacheDir, s.FFMpeg, s.FFProbe, cfg, s.ReadLockManager)
 }
 
-// RefreshDLNA starts/stops the DLNA service as needed.
-func (s *Manager) RefreshDLNA() {
-	dlnaService := s.DLNAService
-	enabled := s.Config.GetDLNADefaultEnabled()
-	if !enabled && dlnaService.IsRunning() {
-		dlnaService.Stop(nil)
-	} else if enabled && !dlnaService.IsRunning() {
-		if err := dlnaService.Start(nil); err != nil {
-			logger.Warnf("error starting DLNA service: %v", err)
-		}
-	}
-}
+// RefreshDLNA 已移除 - Wails 桌面版不需要 DLNA
 
 func createPackageManager(localPath string, srcPathGetter pkg.SourcePathGetter) *pkg.Manager {
 	const timeout = 10 * time.Second
@@ -216,14 +204,6 @@ func (s *Manager) Setup(ctx context.Context, input SetupInput) error {
 	// create the config directory if it does not exist
 	// don't do anything if config is already set in the environment
 	if !config.FileEnvSet() {
-		// #3304 - if config path is relative, it breaks the ffmpeg/ffprobe
-		// paths since they must not be relative. The config file property is
-		// resolved to an absolute path when stash is run normally, so convert
-		// relative paths to absolute paths during setup.
-		// #6287 - this should no longer be necessary since the ffmpeg code
-		// converts to absolute paths. Converting the config location to
-		// absolute means that scraper and plugin paths default to absolute
-		// which we don't want.
 		configFile := input.ConfigLocation
 		configDir := filepath.Dir(configFile)
 

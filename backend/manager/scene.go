@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"net/url"
 
-	"case/backend/internal/manager/config"
+	"case/backend/manager/config"
 	"case/backend/pkg/ffmpeg"
 	"case/backend/pkg/fsutil"
 	"case/backend/pkg/models"

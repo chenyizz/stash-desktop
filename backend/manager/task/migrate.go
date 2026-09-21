@@ -7,7 +7,7 @@ import (
 	"os"
 	"path/filepath"
 
-	"case/backend/internal/manager/config"
+	"case/backend/manager/config"
 	"case/backend/pkg/fsutil"
 	"case/backend/pkg/job"
 	"case/backend/pkg/logger"

@@ -60,7 +60,6 @@ func (t *rawPluginTask) Start() error {
 	}
 
 	if cmd == nil {
-		// if could not find python, just use the command args as-is
 		cmd = stashExec.Command(command[0], command[1:]...)
 	}
 
@@ -97,7 +96,13 @@ func (t *rawPluginTask) Start() error {
 		return fmt.Errorf("error running plugin: %v", err)
 	}
 
-	go t.handlePluginStderr(t.plugin.Name, stderr)
+	// 用统一的 PluginLogger 处理 stderr，不再自己实现
+	pluginLogger := &logger.PluginLogger{
+		Logger: logger.Logger,
+		Prefix: "[" + t.plugin.Name + "] ",
+	}
+	go pluginLogger.ReadLogMessages(stderr)
+
 	t.cmd = cmd
 
 	logger.Debugf("Plugin %s started: %s", t.plugin.Name, strings.Join(cmd.Args, " "))
@@ -126,8 +131,6 @@ func (t *rawPluginTask) Start() error {
 }
 
 func (t *rawPluginTask) getOutput(output string) common.PluginOutput {
-	// try to parse the output as a PluginOutput json. If it fails just
-	// get the raw output
 	ret := common.PluginOutput{}
 	decodeErr := json.Unmarshal([]byte(output), &ret)
 

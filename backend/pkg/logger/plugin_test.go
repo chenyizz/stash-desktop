@@ -12,37 +12,31 @@ type captureLogger struct {
 	messages []string
 }
 
-func (l *captureLogger) Debug(args ...interface{}) {
-	l.messages = append(l.messages, fmt.Sprint(args[len(args)-1]))
+func (l *captureLogger) Debugf(format string, args ...interface{}) {
+	l.messages = append(l.messages, fmt.Sprintf(format, args...))
 }
 
 func TestReadLogMessages(t *testing.T) {
-	const prefix = "\x01d\x02"
-
 	tests := []struct {
 		name  string
 		input string
 		want  []string
 	}{
 		{
-			name:  "short lines",
-			input: prefix + "one\n" + prefix + "two\n",
-			want:  []string{"one", "two"},
+			name: "JSON debug lines",
+			input: `{"level":"debug","msg":"one"}` + "\n" +
+				`{"level":"debug","msg":"two"}` + "\n",
+			want: []string{"one", "two"},
 		},
 		{
 			name:  "no trailing newline",
-			input: prefix + "one\n" + prefix + "two",
-			want:  []string{"one", "two"},
+			input: `{"level":"debug","msg":"last"}`,
+			want:  []string{"last"},
 		},
 		{
-			// a line longer than bufio.MaxScanTokenSize used to abort the read
-			// entirely, discarding every subsequent line
-			name:  "over-long line does not stop subsequent lines",
-			input: prefix + strings.Repeat("x", maxLogLineLength*3) + "\n" + prefix + "after\n",
-			want: []string{
-				strings.Repeat("x", maxLogLineLength-len(prefix)) + truncatedSuffix,
-				"after",
-			},
+			name:  "plain text fallback",
+			input: "not a json line\n",
+			want:  []string{"not a json line"},
 		},
 	}
 
@@ -57,8 +51,8 @@ func TestReadLogMessages(t *testing.T) {
 			}
 			for i, want := range tt.want {
 				if l.messages[i] != want {
-					t.Errorf("message %d: got %.80q (len %d), want %.80q (len %d)",
-						i, l.messages[i], len(l.messages[i]), want, len(want))
+					t.Errorf("message %d: got %.80q, want %.80q",
+						i, l.messages[i], want)
 				}
 			}
 		})

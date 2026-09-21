@@ -9,7 +9,7 @@ import (
 	"path/filepath"
 	"strconv"
 
-	"case/backend/internal/manager/config"
+	"case/backend/manager/config"
 	"case/backend/pkg/job"
 	"case/backend/pkg/logger"
 	"case/backend/pkg/models"

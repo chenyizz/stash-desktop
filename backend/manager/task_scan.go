@@ -11,9 +11,7 @@ import (
 	"sync"
 	"time"
 
-	"github.com/99designs/gqlgen/graphql/handler/lru"
-	"github.com/remeh/sizedwaitgroup"
-	"case/backend/internal/manager/config"
+	"case/backend/manager/config"
 	"case/backend/pkg/file"
 	"case/backend/pkg/file/video"
 	"case/backend/pkg/fsutil"
@@ -27,6 +25,9 @@ import (
 	"case/backend/pkg/scene/generate"
 	"case/backend/pkg/txn"
 	"case/backend/pkg/utils"
+
+	"github.com/99designs/gqlgen/graphql/handler/lru"
+	"github.com/remeh/sizedwaitgroup"
 )
 
 type ScanJob struct {

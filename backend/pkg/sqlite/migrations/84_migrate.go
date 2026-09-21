@@ -9,10 +9,11 @@ import (
 	"slices"
 	"time"
 
-	"github.com/jmoiron/sqlx"
-	"case/backend/internal/manager/config"
+	"case/backend/manager/config"
 	"case/backend/pkg/logger"
 	"case/backend/pkg/sqlite"
+
+	"github.com/jmoiron/sqlx"
 	"gopkg.in/guregu/null.v4"
 )
 

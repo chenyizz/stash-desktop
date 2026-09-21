@@ -1,7 +1,7 @@
 package manager
 
 import (
-	"case/backend/internal/manager/config"
+	"case/backend/manager/config"
 )
 
 type SystemStatus struct {

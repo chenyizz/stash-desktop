@@ -3,11 +3,12 @@ package migrations
 import (
 	"context"
 
-	"github.com/jmoiron/sqlx"
-	"case/backend/internal/manager/config"
+	"case/backend/manager/config"
 	"case/backend/pkg/logger"
 	"case/backend/pkg/models"
 	"case/backend/pkg/sqlite"
+
+	"github.com/jmoiron/sqlx"
 )
 
 func post12(ctx context.Context, db *sqlx.DB) error {

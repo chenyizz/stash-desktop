@@ -8,12 +8,13 @@ import (
 	"time"
 	"unicode"
 
-	"github.com/jmoiron/sqlx"
-	"github.com/spf13/cast"
-	"case/backend/internal/manager/config"
+	"case/backend/manager/config"
 	"case/backend/pkg/logger"
 	"case/backend/pkg/sqlite"
 	"case/backend/pkg/utils"
+
+	"github.com/jmoiron/sqlx"
+	"github.com/spf13/cast"
 )
 
 type schema58Migrator struct {

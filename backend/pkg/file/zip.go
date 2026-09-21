@@ -2,18 +2,17 @@ package file
 
 import (
 	"archive/zip"
-	"bytes"
 	"errors"
 	"fmt"
 	"io"
 	"io/fs"
 	"path/filepath"
+	"unicode/utf8"
 
-	"case/backend/pkg/logger"
 	"case/backend/pkg/models"
-	"github.com/xWTF/chardet"
 
-	"golang.org/x/net/html/charset"
+	"golang.org/x/text/encoding/japanese"
+	"golang.org/x/text/encoding/simplifiedchinese"
 	"golang.org/x/text/transform"
 )
 
@@ -47,42 +46,10 @@ func newZipFS(fs models.FS, path string, size int64) (*zipFS, error) {
 		return nil, err
 	}
 
-	// Concat all Name and Comment for better detection result
-	var buffer bytes.Buffer
+	// 解码所有文件名。优先 UTF-8，其次 GBK，最后 Shift-JIS。
+	// 中文 Windows 创建的 zip 通常是 GBK；日文 Windows 通常是 Shift-JIS。
 	for _, f := range zipReader.File {
-		buffer.WriteString(f.Name)
-		buffer.WriteString(f.Comment)
-	}
-	buffer.WriteString(zipReader.Comment)
-
-	// Detect encoding
-	d, err := chardet.NewTextDetector().DetectBest(buffer.Bytes())
-	if err != nil {
-		// If we can't detect the encoding, just assume it's UTF8
-		logger.Warnf("Unable to detect decoding for %s: %w", path, err)
-	}
-
-	// If the charset is not UTF8, decode'em
-	if d != nil && d.Charset != "UTF-8" {
-		logger.Debugf("Detected non-utf8 zip charset %s (%s): %s", d.Charset, d.Language, path)
-
-		e, _ := charset.Lookup(d.Charset)
-		if e == nil {
-			// if we can't find the encoding, just assume it's UTF8
-			logger.Warnf("Failed to lookup charset %s, language %s", d.Charset, d.Language)
-		} else {
-			decoder := e.NewDecoder()
-			for _, f := range zipReader.File {
-				newName, _, err := transform.String(decoder, f.Name)
-				if err != nil {
-					reader.Close()
-					logger.Warnf("Failed to decode %v: %v", []byte(f.Name), err)
-				} else {
-					f.Name = newName
-				}
-				// Comments are not decoded cuz stash doesn't use that
-			}
-		}
+		f.Name = decodeZipFilename(f.Name)
 	}
 
 	return &zipFS{
@@ -99,16 +66,10 @@ func (f *zipFS) rel(name string) (string, error) {
 
 	relName, err := filepath.Rel(f.zipPath, name)
 	if err != nil {
-		// if the path is not relative to the zip path, then it's not found in the zip file,
-		// so treat this as a file not found
 		return "", fs.ErrNotExist
 	}
 
-	// convert relName to use slash, since zip files do so regardless
-	// of os
-	relName = filepath.ToSlash(relName)
-
-	return relName, nil
+	return filepath.ToSlash(relName), nil
 }
 
 func (f *zipFS) Stat(name string) (fs.FileInfo, error) {
@@ -157,9 +118,7 @@ func (f *zipFS) Open(name string) (fs.ReadDirFile, error) {
 		return nil, err
 	}
 
-	return &zipReadDirFile{
-		File: r,
-	}, nil
+	return &zipReadDirFile{File: r}, nil
 }
 
 func (f *zipFS) Close() error {
@@ -187,4 +146,31 @@ type wrappedReadCloser struct {
 func (f *wrappedReadCloser) Close() error {
 	_ = f.ReadCloser.Close()
 	return f.outer.Close()
+}
+
+// decodeZipFilename 把 zip 里的文件名从可能的 GBK/Shift-JIS 解码成 UTF-8。
+// 优先顺序：UTF-8 → GBK → Shift-JIS。
+// 针对中文和日文 Windows 用户创建的 zip 文件。
+func decodeZipFilename(name string) string {
+	// UTF-8 有效，直接用
+	if utf8.ValidString(name) {
+		return name
+	}
+
+	// 尝试 GBK（简体中文 Windows 的默认编码）
+	if result, _, err := transform.String(simplifiedchinese.GBK.NewDecoder(), name); err == nil {
+		if utf8.ValidString(result) {
+			return result
+		}
+	}
+
+	// 尝试 Shift-JIS（日文 Windows 的默认编码）
+	if result, _, err := transform.String(japanese.ShiftJIS.NewDecoder(), name); err == nil {
+		if utf8.ValidString(result) {
+			return result
+		}
+	}
+
+	// 都失败，原样返回
+	return name
 }

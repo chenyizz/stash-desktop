@@ -499,9 +499,9 @@ func handleScraperStderr(name string, scraperOutputReader io.ReadCloser) {
 	const scraperPrefix = "[Scrape / %s] "
 
 	lgr := logger.PluginLogger{
-		Logger:          logger.Logger,
-		Prefix:          fmt.Sprintf(scraperPrefix, name),
-		DefaultLogLevel: &logger.ErrorLevel,
+		Logger: logger.Logger,
+		Prefix: fmt.Sprintf(scraperPrefix, name),
+		// DefaultLogLevel: &logger.ErrorLevel,
 	}
 	lgr.ReadLogMessages(scraperOutputReader)
 }

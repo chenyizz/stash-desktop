@@ -5,8 +5,7 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/remeh/sizedwaitgroup"
-	"case/backend/internal/manager/config"
+	"case/backend/manager/config"
 	"case/backend/pkg/image"
 	"case/backend/pkg/job"
 	"case/backend/pkg/logger"
@@ -14,6 +13,8 @@ import (
 	"case/backend/pkg/scene"
 	"case/backend/pkg/scene/generate"
 	"case/backend/pkg/sliceutil/stringslice"
+
+	"github.com/remeh/sizedwaitgroup"
 )
 
 type GenerateMetadataInput struct {

@@ -4,15 +4,11 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"log/slog"
 	"os"
-	"path/filepath"
-	"strings"
 	"time"
 
-	"case/backend/internal/desktop"
-	"case/backend/internal/dlna"
-	"case/backend/internal/log"
-	"case/backend/internal/manager/config"
+	"case/backend/manager/config"
 	"case/backend/pkg/ffmpeg"
 	"case/backend/pkg/fsutil"
 	"case/backend/pkg/gallery"
@@ -27,13 +23,12 @@ import (
 	"case/backend/pkg/session"
 	"case/backend/pkg/sqlite"
 	"case/backend/pkg/utils"
-	"case/backend/ui"
 
 	"github.com/remeh/sizedwaitgroup"
 )
 
 // Called at startup
-func Initialize(cfg *config.Config, l *log.Logger) (*Manager, error) {
+func Initialize(cfg *config.Config, l *slog.Logger) (*Manager, error) {
 	ctx := context.TODO()
 
 	db := sqlite.NewDatabase()
@@ -73,14 +68,6 @@ func Initialize(cfg *config.Config, l *log.Logger) (*Manager, error) {
 		Repository: db.Group,
 	}
 
-	sceneServer := &SceneServer{
-		TxnManager:       repo.TxnManager,
-		SceneCoverGetter: repo.Scene,
-	}
-
-	dlnaRepository := dlna.NewRepository(repo)
-	dlnaService := dlna.NewService(dlnaRepository, cfg, sceneServer, repo.Scene, cfg.GetMinimumPlayPercent())
-
 	mgr := &Manager{
 		Config: cfg,
 		Logger: l,
@@ -97,7 +84,7 @@ func Initialize(cfg *config.Config, l *log.Logger) (*Manager, error) {
 		PluginCache:  pluginCache,
 		ScraperCache: scraperCache,
 
-		DLNAService: dlnaService,
+		// DLNAService 已移除 - Wails 不需要 DLNA
 
 		Database:   db,
 		Repository: repo,
@@ -140,11 +127,11 @@ func Initialize(cfg *config.Config, l *log.Logger) (*Manager, error) {
 
 func formatDuration(t time.Duration) string {
 	switch {
-	case t >= time.Minute: // 1m23s or 2h45m12s
+	case t >= time.Minute:
 		t = t.Round(time.Second)
-	case t >= time.Second: // 45.36s
+	case t >= time.Second:
 		t = t.Round(10 * time.Millisecond)
-	default: // 51ms
+	default:
 		t = t.Round(time.Millisecond)
 	}
 
@@ -154,25 +141,14 @@ func formatDuration(t time.Duration) string {
 func initJobManager(cfg *config.Config) *job.Manager {
 	ret := job.NewManager()
 
-	// desktop notifications
+	// 桌面通知：Wails 下暂不实现
 	ctx := context.Background()
 	c := ret.Subscribe(context.Background())
 	go func() {
 		for {
 			select {
 			case j := <-c.RemovedJob:
-				if cfg.GetNotificationsEnabled() {
-					cleanDesc := strings.TrimRight(j.Description, ".")
-
-					if j.StartTime == nil {
-						// Task was never started
-						return
-					}
-
-					timeElapsed := j.EndTime.Sub(*j.StartTime)
-					msg := fmt.Sprintf("Task \"%s\" finished in %s.", cleanDesc, formatDuration(timeElapsed))
-					desktop.SendNotification("Task Finished", msg)
-				}
+				_ = j // 暂时忽略
 			case <-ctx.Done():
 				return
 			}
@@ -197,14 +173,13 @@ func (s *Manager) postInit(ctx context.Context) error {
 	s.RefreshScraperCache()
 	s.RefreshScraperSourceManager()
 
-	s.RefreshDLNA()
+	// DLNA 已移除
 
 	s.SetBlobStoreOptions()
 
-	s.writeStashIcon()
+	// writeStashIcon 已移除 - 由 Wails 处理图标
 
 	// clear the downloads and tmp directories
-	// #1021 - only clear these directories if the generated folder is non-empty
 	if s.Config.GetGeneratedPath() != "" {
 		const deleteTimeout = 1 * time.Second
 
@@ -220,8 +195,8 @@ func (s *Manager) postInit(ctx context.Context) error {
 				}
 			}
 		}, deleteTimeout, func(done chan struct{}) {
-			logger.Info("Please wait. Deleting temporary files...") // print
-			<-done                                                  // and wait for deletion
+			logger.Info("Please wait. Deleting temporary files...")
+			<-done
 			logger.Info("Temporary files deleted.")
 		})
 	}
@@ -249,33 +224,20 @@ func (s *Manager) postInit(ctx context.Context) error {
 	return nil
 }
 
-func (s *Manager) writeStashIcon() {
-	iconPath := filepath.Join(s.Config.GetConfigPath(), "icon.png")
-	err := os.WriteFile(iconPath, ui.FaviconProvider.GetFaviconPng(), 0644)
-	if err != nil {
-		logger.Errorf("Couldn't write icon file: %v", err)
-	}
-}
+// writeStashIcon 已删除 - 用 Wails 的图标系统替代
 
 func (s *Manager) RefreshFFMpeg(ctx context.Context) {
-	// use same directory as config path
-	// executing binaries requires directory to be included
-	// https://pkg.go.dev/os/exec#hdr-Executables_in_the_current_directory
 	configDirectory := s.Config.GetConfigPathAbs()
 	stashHomeDir := paths.GetStashHomeDirectory()
 
-	// prefer the configured paths
 	ffmpegPath := s.Config.GetFFMpegPath()
 	ffprobePath := s.Config.GetFFProbePath()
 
-	// ensure the paths are valid
 	if ffmpegPath != "" {
-		// path was set explicitly
 		if err := ffmpeg.ValidateFFMpeg(ffmpegPath); err != nil {
 			logger.Errorf("invalid ffmpeg path: %v", err)
 			return
 		}
-
 		if err := ffmpeg.ValidateFFMpegCodecSupport(ffmpegPath); err != nil {
 			logger.Warn(err)
 		}
@@ -296,7 +258,7 @@ func (s *Manager) RefreshFFMpeg(ctx context.Context) {
 		logger.Warn("Couldn't find FFmpeg")
 	}
 	if ffprobePath == "" {
-		logger.Warn("Couldn't find FFProbe")
+		logger.Warn("Couldn't find FFprobe")
 	}
 
 	if ffmpegPath != "" && ffprobePath != "" {
@@ -306,7 +268,6 @@ func (s *Manager) RefreshFFMpeg(ctx context.Context) {
 		s.FFMpeg = ffmpeg.NewEncoder(ffmpegPath)
 		s.FFProbe = ffmpeg.NewFFProbe(ffprobePath)
 
-		// initialise hardware support with background context
 		s.FFMpeg.InitHWSupport(context.Background())
 	}
 }
