@@ -16,6 +16,10 @@ type App struct {
 	app *application.App
 }
 
+func (a *App) SetApplication(wailsApp *application.App) {
+	a.app = wailsApp // ← 必须有这个方法
+}
+
 func New() *App {
 	return &App{}
 }

@@ -29,6 +29,8 @@ func main() {
 		},
 	})
 
+	appService.SetApplication(wailsApp)
+
 	wailsApp.Window.NewWithOptions(application.WebviewWindowOptions{
 		Title:  "case",
 		Width:  1280,
