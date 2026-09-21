@@ -47,7 +47,7 @@ func (a *App) ServiceStartup(ctx context.Context, options application.ServiceOpt
 	})
 
 	// 4. UI Handler
-	uiHandler := logger.NewUIHandler(a.app, slog.LevelInfo)
+	uiHandler := logger.NewUIHandler(&wailsEmitter{app: a.app}, slog.LevelInfo)
 
 	// 5. Multi Handler
 	multi := logger.NewMultiHandler(fileHandler, uiHandler)

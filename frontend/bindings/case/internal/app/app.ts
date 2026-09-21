@@ -5,6 +5,10 @@
 // @ts-ignore: Unused imports
 import { Call as $Call, CancellablePromise as $CancellablePromise } from "@wailsio/runtime";
 
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+// @ts-ignore: Unused imports
+import * as application$0 from "../../../github.com/wailsapp/wails/v3/pkg/application/models.js";
+
 /**
  * GetDataDir 返回数据目录
  */
@@ -24,4 +28,8 @@ export function GetVersion(): $CancellablePromise<string> {
  */
 export function Ping(): $CancellablePromise<string> {
     return $Call.ByID(2559294044);
+}
+
+export function SetApplication(wailsApp: application$0.App | null): $CancellablePromise<void> {
+    return $Call.ByID(151671058, wailsApp);
 }
