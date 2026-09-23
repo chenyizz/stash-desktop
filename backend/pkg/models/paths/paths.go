@@ -26,14 +26,14 @@ func NewPaths(generatedPath string, blobsPath string) Paths {
 	return p
 }
 
-// GetStashHomeDirectory returns the default per-user config directory.
+// GetCaseHomeDirectory returns the default per-user config directory.
 // 仅作为未配置时的回退默认值；已显式配置的路径不受影响。
-func GetStashHomeDirectory() string {
+func GetCaseHomeDirectory() string {
 	return filepath.Join(fsutil.GetHomeDirectory(), ".case")
 }
 
 // GetDefaultDatabaseFilePath returns the default database path.
 // 仅作为未配置时的回退默认值；已显式配置的路径不受影响。
 func GetDefaultDatabaseFilePath() string {
-	return filepath.Join(GetStashHomeDirectory(), "case.db")
+	return filepath.Join(GetCaseHomeDirectory(), "case.db")
 }

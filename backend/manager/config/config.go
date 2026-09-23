@@ -421,7 +421,7 @@ func (i *Config) initialisePublicWhitelist() error {
 	return nil
 }
 
-// GetPublicWhitelist returns the list of IPs and subnets that are allowed external access to Stash when public access is disabled.
+// GetPublicWhitelist returns the list of IPs and subnets that are allowed external access to Case when public access is disabled.
 func (i *Config) GetPublicWhitelist() (nets []net.IPNet, addrs []net.IP) {
 	// don't bother protecting this as it's not writable at runtime
 	return i.publicIPWhitelist.nets, i.publicIPWhitelist.addrs
@@ -431,19 +431,19 @@ func (i *Config) InitTLS() {
 	configDirectory := i.GetConfigPath()
 	tlsPaths := []string{
 		configDirectory,
-		paths.GetStashHomeDirectory(),
+		paths.GetCaseHomeDirectory(),
 	}
 
 	i.certFile = i.getString(sslCertPath)
 	if i.certFile == "" {
 		// Look for default file
-		i.certFile = fsutil.FindInPaths(tlsPaths, "stash.crt")
+		i.certFile = fsutil.FindInPaths(tlsPaths, "case.crt")
 	}
 
 	i.keyFile = i.getString(sslKeyPath)
 	if i.keyFile == "" {
 		// Look for default file
-		i.keyFile = fsutil.FindInPaths(tlsPaths, "stash.key")
+		i.keyFile = fsutil.FindInPaths(tlsPaths, "case.key")
 	}
 }
 
@@ -464,7 +464,7 @@ func (i *Config) GetNotificationsEnabled() bool {
 	return i.getBool(NotificationsEnabled)
 }
 
-// GetShowOneTimeMovedNotification shows whether a small notification to inform the user that Stash
+// GetShowOneTimeMovedNotification shows whether a small notification to inform the user that Case
 // will no longer show a terminal window, and instead will be available in the tray, should be shown.
 // It is true when an existing system is started after upgrading, and set to false forever after it is shown.
 func (i *Config) GetShowOneTimeMovedNotification() bool {
@@ -798,13 +798,13 @@ func (i *Config) GetBackupDirectoryPathOrDefault() string {
 }
 
 // GetFFMpegPath returns the path to the FFMpeg executable.
-// If empty, stash will attempt to resolve it from the path.
+// If empty, Case will attempt to resolve it from the path.
 func (i *Config) GetFFMpegPath() string {
 	return i.getString(FFMpegPath)
 }
 
 // GetFFProbePath returns the path to the FFProbe executable.
-// If empty, stash will attempt to resolve it from the path.
+// If empty, Case will attempt to resolve it from the path.
 func (i *Config) GetFFProbePath() string {
 	return i.getString(FFProbePath)
 }
@@ -1736,7 +1736,7 @@ func (i *Config) GetDefaultGenerateSettings() *models.GenerateMetadataOptions {
 }
 
 // GetDLNAServerName returns the visible name of the DLNA server. If empty,
-// "stash" will be used.
+// "case" will be used.
 func (i *Config) GetDLNAServerName() string {
 	return i.getString(DLNAServerName)
 }

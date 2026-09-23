@@ -8,27 +8,27 @@ import (
 )
 
 var excludeTestFilenames = []string{
-	"/stash/videos/filename.mp4",
-	"/stash/videos/new filename.mp4",
+	"/case/videos/filename.mp4",
+	"/case/videos/new filename.mp4",
 	"filename sample.mp4",
-	"/stash/videos/exclude/not wanted.webm",
-	"/stash/videos/exclude/not wanted2.webm",
+	"/case/videos/exclude/not wanted.webm",
+	"/case/videos/exclude/not wanted2.webm",
 	"/somewhere/trash/not wanted.wmv",
-	"/disk2/stash/videos/exclude/!!wanted!!.avi",
-	"/disk2/stash/videos/xcl/not wanted.avi",
-	"/stash/videos/partial.file.001.webm",
-	"/stash/videos/partial.file.002.webm",
-	"/stash/videos/partial.file.003.webm",
-	"/stash/videos/sample file sample.mkv",
-	"/stash/videos/.ckRVp1/.still_encoding.mp4",
-	"c:\\stash\\videos\\exclude\\filename  windows.mp4",
-	"c:\\stash\\videos\\filename  windows.mp4",
+	"/disk2/case/videos/exclude/!!wanted!!.avi",
+	"/disk2/case/videos/xcl/not wanted.avi",
+	"/case/videos/partial.file.001.webm",
+	"/case/videos/partial.file.002.webm",
+	"/case/videos/partial.file.003.webm",
+	"/case/videos/sample file sample.mkv",
+	"/case/videos/.ckRVp1/.still_encoding.mp4",
+	"c:\\case\\videos\\exclude\\filename  windows.mp4",
+	"c:\\case\\videos\\filename  windows.mp4",
 	"\\\\network\\videos\\filename  windows network.mp4",
 	"\\\\network\\share\\windows network wanted.mp4",
 	"\\\\network\\share\\windows network wanted sample.mp4",
 	"\\\\network\\private\\windows.network.skip.mp4",
-	"/stash/videos/a5.mp4",
-	"/stash/videos/mIxEdCaSe.mp4"}
+	"/case/videos/a5.mp4",
+	"/case/videos/mIxEdCaSe.mp4"}
 
 var excludeTests = []struct {
 	testPattern []string
@@ -36,9 +36,9 @@ var excludeTests = []struct {
 }{
 	{[]string{"sample\\.mp4$", "trash", "\\.[\\d]{3}\\.webm$"}, 6}, // generic
 	{[]string{"no_match\\.mp4"}, 0},                                // no match
-	{[]string{"^/stash/videos/exclude/", "/videos/xcl/"}, 3},       // linux
+	{[]string{"^/case/videos/exclude/", "/videos/xcl/"}, 3},        // linux
 	{[]string{"/\\.[[:word:]]+/"}, 1},                              // linux hidden dirs (handbrake unraid issue?)
-	{[]string{"c:\\\\stash\\\\videos\\\\exclude"}, 1},              // windows
+	{[]string{"c:\\\\case\\\\videos\\\\exclude"}, 1},               // windows
 	{[]string{"\\/[/invalid"}, 0},                                  // invalid pattern
 	{[]string{"\\/[/invalid", "sample\\.[[:alnum:]]+$"}, 3},        // invalid pattern but continue
 	{[]string{"^\\\\\\\\network"}, 4},                              // windows net share

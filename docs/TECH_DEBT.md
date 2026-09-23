@@ -44,6 +44,17 @@
 - 冻结区策略导致 `backend/pkg` 长期无法重构，阶段 7 处理。
 - `internal/app` 可能随功能增加膨胀，需在阶段 3 前评估拆分。
 
+## 静态检查（go vet）
+
+`go vet ./backend/manager/...` 有 5 条既有告警（均在冻结区 `backend/manager`），暂不修，待 Step 5b 完成后单独评估：
+
+- `generator_interactive_heatmap_speed.go:132`：`%d` 用于 `float64`（应 `%f`）
+- `task_generate.go:245`：`logger.Infof(logMsg)` 非常量格式串（应 `logger.Infof("%s", logMsg)`）
+- `task_generate_clip_preview.go:43`：`logger.Errorf` 使用 `%w`（应 `%v`）
+- `task_scan.go:112` / `task_scan.go:290`：`logger.Errorf(string(debug.Stack()))` 非常量格式串（应 `logger.Errorf("%s", debug.Stack())`）
+
+影响：`go test ./backend/manager/...` 默认因 vet 失败，需加 `-vet=off`。
+
 ## 命名遗留（Stash）
 
 - **评估项：`StashID` / `StashIDs` / `stash_id`**（1300+ 处，60+ 文件）。当前视为领域术语（stash-box 的外部 ID），**暂不改**。如未来接入其他元数据源，考虑改为 `ExternalID`，届时与 scraper 子系统一起做。

@@ -21,8 +21,8 @@ func TestDefaultConfigLocations_UseCaseDir(t *testing.T) {
 	}
 }
 
-func TestGetStashHomeDirectory_DefaultsToCase(t *testing.T) {
-	assert.Equal(t, filepath.Join(fsutil.GetHomeDirectory(), ".case"), paths.GetStashHomeDirectory())
+func TestGetCaseHomeDirectory_DefaultsToCase(t *testing.T) {
+	assert.Equal(t, filepath.Join(fsutil.GetHomeDirectory(), ".case"), paths.GetCaseHomeDirectory())
 }
 
 func TestGetDefaultDatabaseFilePath_UsesCaseDB(t *testing.T) {

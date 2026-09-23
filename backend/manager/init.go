@@ -228,7 +228,7 @@ func (s *Manager) postInit(ctx context.Context) error {
 
 func (s *Manager) RefreshFFMpeg(ctx context.Context) {
 	configDirectory := s.Config.GetConfigPathAbs()
-	stashHomeDir := paths.GetStashHomeDirectory()
+	caseHomeDir := paths.GetCaseHomeDirectory()
 
 	ffmpegPath := s.Config.GetFFMpegPath()
 	ffprobePath := s.Config.GetFFProbePath()
@@ -242,7 +242,7 @@ func (s *Manager) RefreshFFMpeg(ctx context.Context) {
 			logger.Warn(err)
 		}
 	} else {
-		ffmpegPath = ffmpeg.ResolveFFMpeg(configDirectory, stashHomeDir)
+		ffmpegPath = ffmpeg.ResolveFFMpeg(configDirectory, caseHomeDir)
 	}
 
 	if ffprobePath != "" {
@@ -251,7 +251,7 @@ func (s *Manager) RefreshFFMpeg(ctx context.Context) {
 			return
 		}
 	} else {
-		ffprobePath = ffmpeg.ResolveFFProbe(configDirectory, stashHomeDir)
+		ffprobePath = ffmpeg.ResolveFFProbe(configDirectory, caseHomeDir)
 	}
 
 	if ffmpegPath == "" {
