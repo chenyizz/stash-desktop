@@ -33,18 +33,20 @@
 ## 使用示例
 
 ```go
+// 方式 1：只解析，拿到元数据自己处理
 movie, err := nfo.ParseFile(filepath.Join(dir, "FDD-2002.nfo"))
 if err != nil {
     logger.Warnf("skip nfo: %v", err)
     return
 }
 meta := movie.SceneMetadata()
+// meta.Title / meta.Code / meta.TagNames ... 由调用方决定怎么用
 
+// 方式 2（推荐）：用 Applier 一步到位（解析 + 回填 Scene）
 applier := &nfo.Applier{Repo: mgr.Repository}
-if err := applier.Apply(context.Background(), sceneID, videoPath); err != nil {
+if err := applier.Apply(ctx, sceneID, videoPath); err != nil {
     logger.Errorf("apply nfo: %v", err)
 }
-_ = meta
 ```
 
 ## 前置条件
