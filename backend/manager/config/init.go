@@ -29,7 +29,8 @@ var (
 
 	defaultConfigLocations = []string{
 		"config.yml",
-		filepath.Join(homeDir, ".stash", "config.yml"),
+		// 仅作为未配置时的回退默认目录；已显式配置的路径不受影响
+		filepath.Join(homeDir, ".case", "config.yml"),
 	}
 
 	// map of env vars to config keys

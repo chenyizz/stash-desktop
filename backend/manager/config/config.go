@@ -601,8 +601,9 @@ func (i *Config) GetConfigPathAbs() string {
 
 // GetDefaultDatabaseFilePath returns the default database filename,
 // which is located in the same directory as the config file.
+// 仅作为未配置时的回退默认值；已显式配置的路径不受影响。
 func (i *Config) GetDefaultDatabaseFilePath() string {
-	return filepath.Join(i.GetConfigPath(), "stash-go.sqlite")
+	return filepath.Join(i.GetConfigPath(), "case.db")
 }
 
 // forKey returns the Koanf instance that should be used to get the provided

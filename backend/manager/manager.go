@@ -177,7 +177,8 @@ func (s *Manager) RefreshPluginSourceManager() {
 
 func setSetupDefaults(input *SetupInput) {
 	if input.ConfigLocation == "" {
-		input.ConfigLocation = filepath.Join(fsutil.GetHomeDirectory(), ".stash", "config.yml")
+		// 仅作为未配置时的回退默认值；已显式配置的路径不受影响
+		input.ConfigLocation = filepath.Join(fsutil.GetHomeDirectory(), ".case", "config.yml")
 	}
 
 	configDir := filepath.Dir(input.ConfigLocation)
@@ -189,7 +190,7 @@ func setSetupDefaults(input *SetupInput) {
 	}
 
 	if input.DatabaseFile == "" {
-		input.DatabaseFile = filepath.Join(configDir, "stash-go.sqlite")
+		input.DatabaseFile = filepath.Join(configDir, "case.db")
 	}
 
 	if input.BlobsLocation == "" {
