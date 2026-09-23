@@ -116,11 +116,9 @@ func DateFromYear(year int) Date
 
 | 模块 / 文件                     | 职责                                      |
 | ------------------------------- | ----------------------------------------- |
-| `ffmpeg.go` / `ffprobe.go`      | FFmpeg / FFProbe 封装与路径探测           |
-| `codec.go` / `codec_hardware.go`| 编解码参数与硬件加速检测（NVENC 等）      |
+| `ffmpeg.go` / `ffprobe.go` / `codec*.go` | FFmpeg/FFProbe 封装、硬件加速检测（NVENC 等） |
 | `stream*.go` / `types.go`       | 转码、流式传输、公共类型与参数            |
-| `config.go` / `enums.go`        | `Config` 读写/校验、枚举（HashAlgorithm、BlobStorageType 等） |
-| `stash_config.go` / `tasks.go` / `ui.go` | 库路径、任务与 UI 配置           |
+| `config.go` / `enums.go` / `stash_config.go` / `tasks.go` / `ui.go` | 配置读写校验、枚举、库路径/任务/UI |
 
 **注意**：`backend/manager/config` 属冻结区。
 
@@ -162,9 +160,10 @@ func DateFromYear(year int) Date
 
 ### frontend/src/
 
-| 路径                      | 职责                   |
-| ------------------------- | ---------------------- |
-| `App.svelte` / `main.ts`  | 主界面与入口挂载       |
+| 路径                      | 职责                                              |
+| ------------------------- | ------------------------------------------------- |
+| `App.svelte` / `main.ts`  | 路由 shell（列表 ↔ 详情）与入口挂载              |
+| `lib/`                    | `router.svelte.ts`（hash 路由）、`components/`（SceneList/SceneDetail）、`format.ts`、`external.ts` |
 
 ---
 
@@ -194,6 +193,7 @@ git diff --name-only HEAD -- backend/manager backend/pkg  # 找冻结区改动
 
 | 日期       | 变更                                                         |
 | ---------- | ------------------------------------------------------------ |
+| 2026-09-23 | 阶段 2.4.4：详情页 + hash 路由（`frontend/src/lib/`），ADR-006/007 |
 | 2026-09-23 | 阶段 2.4.3：`internal/app/scene.go` 新增 `GetScene` / `SceneDetailDTO` |
 | 2026-09-23 | 阶段 2.4.2：新增 `nfo/applier.go` 并在 `scene.ScanHandler` post-commit 接入 |
 | 2026-09-23 | 复核实际文件：修正 models 类型摘要、internal/app 与 frontend 清单，补 `ffmpeg` / `manager/config` / `scene` 模块，合并 utils/fsutil |

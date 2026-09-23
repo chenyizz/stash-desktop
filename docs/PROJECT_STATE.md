@@ -20,15 +20,17 @@
 - NFO 解析模块：`backend/pkg/metadata/nfo/`（解析 + `SceneMetadata` 映射 + 11 用例）
 - 扫描时自动读 NFO 并回填场景元数据（`nfo.Applier`，只填不覆盖）
 - `GetScene(id)` 返回完整 `SceneDetailDTO`（元数据 + 结构化 tags/performers + files）
+- 详情页 Svelte 组件 + 自研 hash 路由（列表 ↔ 详情）
 
 ## 当前焦点
 
-**阶段 2.4：场景详情页**
+**阶段 2.5：封面图**
 
 ## 下一步
 
-1. 详情页 Svelte 组件
-2. 封面图：AssetServer
+1. 封面图：AssetServer 挂载 `data/blobs/`
+2. 详情页缩略图/截图展示
+3. 扫描完成事件，替代 `setTimeout`
 
 ## 已知问题
 
@@ -40,6 +42,8 @@
 
 ## 最近变更
 
+- 新增详情页 + hash 路由（`frontend/src/lib/`）：SceneList/SceneDetail、router、format、external
+- 新增 ADR-006（自研 hash 路由）、ADR-007（详情数据用 `$state` + onMount）
 - 新增 `GetScene` 详情 DTO：tags/performers 结构化（ID+Name），files 含 duration/分辨率/codec
 - 扫描接入 NFO：scene post-commit hook 调用 `nfo.Applier`，只填不覆盖、关系只增
 - 完成 NFO 解析模块（Go 原生，含映射与测试）

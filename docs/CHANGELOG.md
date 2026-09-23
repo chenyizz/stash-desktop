@@ -1,5 +1,31 @@
 # CHANGELOG
 
+## 2026-09-23（阶段 2.4.4 - 详情页 + hash 路由）
+
+### 新增
+
+- `frontend/src/lib/router.svelte.ts`：自研 hash 路由（`#/`、`#/scenes/:id`）
+- `frontend/src/lib/format.ts`：`formatDuration` / `formatBitrate`
+- `frontend/src/lib/external.ts`：`openExternal`（`@wailsio/runtime` 的 `Browser.OpenURL`，失败仅 `console.error`）
+- `frontend/src/lib/components/SceneList.svelte`：扫描区 + 列表（由 App.svelte 原样迁出，卡片可点击跳详情）
+- `frontend/src/lib/components/SceneDetail.svelte`：详情页（加载三态 + `requestId` 竞态处理 + 返回 + 外部链接）
+- `docs/ARCHITECTURE.md`：ADR-006（自研 hash 路由）、ADR-007（详情数据 `$state` + `onMount`）
+
+### 修改
+
+- `frontend/src/App.svelte`：改为路由 shell，按 route 分发 SceneList / SceneDetail
+
+### 修复
+
+- 无
+
+### 验证
+
+- `npm run check`（svelte-check）：0 errors / 0 warnings
+- `npm run build`：通过
+- `wails3 dev`：分别在第 3 步（列表迁移后）与第 4 步（详情接入后）冒烟，构建成功、WebView2 启动成功
+- 手工冒烟点：列表 → 详情 → 返回、深链 `#/scenes/<id>`
+
 ## 2026-09-23（阶段 2.4.3 - GetScene 完整 DTO）
 
 ### 新增

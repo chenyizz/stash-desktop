@@ -55,3 +55,37 @@
 - Scraper 需要 HTTP、站点适配、认证、限流、缓存、匹配、合并。
 - 通用插件系统只解决加载与运行，不解决 Scraper 全部问题。
 - 当前阶段只需要本地 NFO 解析。
+
+## ADR-006：阶段 2.4 用自研 hash 路由
+
+决策：极简自研，不引入路由库。
+
+理由：
+
+- 只有 2 个路由，Wails WebView hash 模式最稳，YAGNI。
+
+重评时机：
+
+- 阶段 3 页面超 5 个，或需要嵌套路由/守卫/代码分割。
+
+约束：
+
+- 路由逻辑集中在 `frontend/src/lib/router.svelte.ts`，`App.svelte` 只做分发。
+
+## ADR-007：阶段 2.4 详情数据用 `$state` + `onMount`
+
+决策：详情数据不引入 TanStack Query，用 `$state` + `onMount`。
+
+理由：
+
+- 只有 2 个查询，TanStack Query 当前收益 < 成本。
+
+实现约束：
+
+- 竞态用 `requestId` 丢弃过期响应；
+- `onDestroy` 时递增 `requestId`，避免已销毁组件 setState；
+- loading/error/success 用独立 `$state`。
+
+重评时机：
+
+- 阶段 3 引入分页/虚拟滚动/搜索时重新评估。
