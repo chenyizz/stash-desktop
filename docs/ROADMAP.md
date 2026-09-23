@@ -12,8 +12,8 @@
 
 ### 2.5 封面图
 
-- [ ] AssetServer 挂载 `data/blobs/`
-- [ ] 前端 `<img src="/covers/xxx.jpg">`
+- [x] AssetServer 中间件挂载 `/covers/<id>`（blob store）
+- [x] 前端 `<img src={coverUrl}>`（详情页）
 - [ ] 缩略图生成：FFmpeg
 
 ## 阶段 3：核心业务

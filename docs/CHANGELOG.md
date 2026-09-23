@@ -1,5 +1,38 @@
 # CHANGELOG
 
+## 2026-09-23（阶段 2.4.5 - 封面图）
+
+### 新增
+
+- `backend/pkg/metadata/cover/cover.go`：封面策略链 `poster → 同名图 → FFmpeg 20%`，含 6 个用例
+- `internal/app/cover.go`：`ensureCover`（按需生成并持久化）+ `CoverMiddleware`（`/covers/<sceneID>` 输出，包级函数避免被 Wails 绑定）
+- 详情页封面展示 + 无图占位（首字母 + `hsl(id*47 % 360, 20%, 15%)`，`aspect-ratio: 2/3`）
+- `docs/TECH_DEBT.md`：分类技术债清单
+
+### 修改
+
+- `internal/app/scene.go`：`SceneDetailDTO` 增 `CoverURL` / `CoverWidth` / `CoverHeight`；`GetScene` 在读取事务外按需生成封面
+- `main.go`：`AssetOptions.Middleware` 注册 `app.CoverMiddleware`
+- `docs/PROJECT_STATE.md`：新增 5 条封面技术债 + 指向 `docs/TECH_DEBT.md`
+
+### 修复
+
+- 无
+
+### 验证
+
+- `gofmt` / `go vet ./backend/pkg/metadata/cover/... ./internal/app/...`：通过
+- `go test ./backend/pkg/metadata/cover/... ./backend/pkg/metadata/nfo/... ./backend/pkg/scene/... ./internal/app/...`：全部 PASS
+- `go build ./...`：通过
+- `npm run check`：0 errors / 0 warnings；`npm run build`：通过
+- `wails3 dev`：构建成功、AssetServer middleware 生效、WebView2 启动成功
+
+### 决策
+
+- 封面复用 Stash blob store（`Scene.UpdateCover`），文件落 `data/blobs/xx/yy/md5`，DB 记 `cover_blob` checksum，**不新增迁移**
+- 详情页按需生成（零冻结区改动）；截帧 20%（与 `GenerateCoverTask` 一致）
+- `CoverURL` 带 `?v=<updatedAt>` 处理浏览器缓存
+
 ## 2026-09-23（阶段 2.4.4 - 详情页 + hash 路由）
 
 ### 新增

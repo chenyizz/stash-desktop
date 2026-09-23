@@ -122,14 +122,12 @@ func DateFromYear(year int) Date
 
 **注意**：`backend/manager/config` 属冻结区。
 
-### backend/pkg/metadata/nfo/（新增）
+### backend/pkg/metadata/
 
-| 文件                          | 职责                                                         |
-| ----------------------------- | ------------------------------------------------------------ |
-| `movie.go` / `nfo.go`         | Kodi `<movie>` DTO；`Parse` / `ParseFile` / `FindForVideo`   |
-| `mapping.go`                  | `Movie → SceneMetadata` 纯映射                               |
-| `applier.go`                  | `Applier.Apply`：扫描后回填元数据（只填不覆盖，事务外 I/O）  |
-| `*_test.go` / `testdata/`     | 表驱动测试与样本                                             |
+| 路径      | 职责                                                         |
+| --------- | ------------------------------------------------------------ |
+| `nfo/`    | Kodi DTO + `Parse`/`ParseFile`；`mapping`；`applier`（扫描回填） |
+| `cover/`  | 封面策略链：poster → 同名图 → FFmpeg 20%                     |
 
 ### backend/pkg/logger/
 
@@ -152,6 +150,7 @@ func DateFromYear(year int) Date
 | ------------------ | ------------------------------------------------------------ |
 | `app.go`           | Wails `ServiceStartup`、`ScanLibrary` / `FindScenes`、`SceneDTO` 定义 |
 | `scene.go`         | `GetScene` / `SceneDetailDTO` / `TagDTO` / `PerformerDTO` / `SceneFileDTO` |
+| `cover.go`         | `ensureCover`（按需生成）+ `CoverMiddleware`（`/covers/<id>`） |
 | `config.go`        | 配置初始化（`setupConfig`）                                  |
 | `logging.go`       | 日志初始化与 UI Handler                                      |
 | `paths.go` / `wails_emitter.go` | 数据目录布局、事件/日志推送适配             |
@@ -193,6 +192,7 @@ git diff --name-only HEAD -- backend/manager backend/pkg  # 找冻结区改动
 
 | 日期       | 变更                                                         |
 | ---------- | ------------------------------------------------------------ |
+| 2026-09-23 | 阶段 2.4.5：`metadata/cover/` 策略链 + `internal/app/cover.go`（按需封面 `/covers/<id>`） |
 | 2026-09-23 | 阶段 2.4.4：详情页 + hash 路由（`frontend/src/lib/`），ADR-006/007 |
 | 2026-09-23 | 阶段 2.4.3：`internal/app/scene.go` 新增 `GetScene` / `SceneDetailDTO` |
 | 2026-09-23 | 阶段 2.4.2：新增 `nfo/applier.go` 并在 `scene.ScanHandler` post-commit 接入 |

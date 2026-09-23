@@ -14,6 +14,11 @@
   // Monotonic request id: stale responses and destroyed components are ignored.
   let requestId = 0;
 
+  let hue = $derived(scene ? (scene.id * 47) % 360 : 0);
+  let initial = $derived(
+    (scene?.title?.trim() || scene?.code?.trim() || "?").charAt(0).toUpperCase(),
+  );
+
   async function load(sceneId: number) {
     const req = ++requestId;
     loading = true;
@@ -53,29 +58,41 @@
   {:else if error}
     <p class="error">{error}</p>
   {:else if scene}
-    <header>
-      <h1>{scene.title || scene.code || "(无标题)"}</h1>
-      <div class="badges">
-        {#if scene.organized}<span class="badge">已整理</span>{/if}
-        {#if scene.rating > 0}
-          <span class="badge">评分 {scene.rating}/100</span>
+    <div class="detail-top">
+      <div class="cover">
+        {#if scene.coverUrl}
+          <img src={scene.coverUrl} alt={scene.title || scene.code || "cover"} />
         {:else}
-          <span class="badge muted">未评分</span>
+          <div class="cover-placeholder" style={`--hue: ${hue}`}>{initial}</div>
         {/if}
-        {#if scene.resolution}<span class="badge muted">{scene.resolution}</span>{/if}
-        {#if scene.duration > 0}<span class="badge muted">{formatDuration(scene.duration)}</span>{/if}
       </div>
-    </header>
 
-    <section class="meta">
-      <div><span class="k">番号</span><span>{scene.code || "-"}</span></div>
-      <div><span class="k">工作室</span><span>{scene.studioName || "-"}</span></div>
-      <div><span class="k">导演</span><span>{scene.director || "-"}</span></div>
-      <div><span class="k">发行日期</span><span>{scene.date || "-"}</span></div>
-      <div><span class="k">制作日期</span><span>{scene.productionDate || "-"}</span></div>
-      <div><span class="k">创建</span><span>{scene.createdAt || "-"}</span></div>
-      <div><span class="k">更新</span><span>{scene.updatedAt || "-"}</span></div>
-    </section>
+      <div class="head">
+        <header>
+          <h1>{scene.title || scene.code || "(无标题)"}</h1>
+          <div class="badges">
+            {#if scene.organized}<span class="badge">已整理</span>{/if}
+            {#if scene.rating > 0}
+              <span class="badge">评分 {scene.rating}/100</span>
+            {:else}
+              <span class="badge muted">未评分</span>
+            {/if}
+            {#if scene.resolution}<span class="badge muted">{scene.resolution}</span>{/if}
+            {#if scene.duration > 0}<span class="badge muted">{formatDuration(scene.duration)}</span>{/if}
+          </div>
+        </header>
+
+        <section class="meta">
+          <div><span class="k">番号</span><span>{scene.code || "-"}</span></div>
+          <div><span class="k">工作室</span><span>{scene.studioName || "-"}</span></div>
+          <div><span class="k">导演</span><span>{scene.director || "-"}</span></div>
+          <div><span class="k">发行日期</span><span>{scene.date || "-"}</span></div>
+          <div><span class="k">制作日期</span><span>{scene.productionDate || "-"}</span></div>
+          <div><span class="k">创建</span><span>{scene.createdAt || "-"}</span></div>
+          <div><span class="k">更新</span><span>{scene.updatedAt || "-"}</span></div>
+        </section>
+      </div>
+    </div>
 
     {#if (scene.performers ?? []).length > 0}
       <section>
@@ -177,6 +194,37 @@
     border-radius: 4px;
     cursor: pointer;
     margin-bottom: 1.25rem;
+  }
+  .detail-top {
+    display: flex;
+    gap: 1.5rem;
+    align-items: flex-start;
+  }
+  .cover {
+    flex: 0 0 220px;
+  }
+  .cover img,
+  .cover-placeholder {
+    width: 100%;
+    aspect-ratio: 2 / 3;
+    border-radius: 8px;
+    display: block;
+    object-fit: cover;
+    background: #1c1c1c;
+  }
+  .cover-placeholder {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #fff;
+    font-size: 3rem;
+    font-weight: 700;
+    user-select: none;
+    background: hsl(var(--hue), 20%, 15%);
+  }
+  .head {
+    flex: 1;
+    min-width: 0;
   }
   header h1 {
     margin: 0 0 0.75rem;

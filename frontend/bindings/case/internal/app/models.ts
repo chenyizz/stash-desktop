@@ -44,6 +44,13 @@ export interface SceneDetailDTO {
     "performers": PerformerDTO[] | null;
 
     /**
+     * Cover fields. CoverURL is empty when no cover is available.
+     */
+    "coverUrl": string;
+    "coverWidth": number;
+    "coverHeight": number;
+
+    /**
      * Convenience fields for the primary file. Duration/FrameRate are 0 when
      * unknown; Resolution is empty when dimensions are unknown.
      */

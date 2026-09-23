@@ -58,6 +58,11 @@ type SceneDetailDTO struct {
 	Tags       []TagDTO       `json:"tags"`
 	Performers []PerformerDTO `json:"performers"`
 
+	// Cover fields. CoverURL is empty when no cover is available.
+	CoverURL    string `json:"coverUrl"`
+	CoverWidth  int    `json:"coverWidth"`
+	CoverHeight int    `json:"coverHeight"`
+
 	// Convenience fields for the primary file. Duration/FrameRate are 0 when
 	// unknown; Resolution is empty when dimensions are unknown.
 	Path       string  `json:"path"`
@@ -84,6 +89,10 @@ func (a *App) GetScene(id int) (*SceneDetailDTO, error) {
 	}
 
 	var dto *SceneDetailDTO
+	var coverVideoPath string
+	var coverWidth int
+	var coverDuration float64
+	var updatedAtUnix int64
 
 	err := a.mgr.Repository.WithReadTxn(context.Background(), func(ctx context.Context) error {
 		s, err := a.mgr.Repository.Scene.Find(ctx, id)
@@ -113,11 +122,26 @@ func (a *App) GetScene(id int) (*SceneDetailDTO, error) {
 			return err
 		}
 
+		if primary := s.Files.Primary(); primary != nil {
+			coverVideoPath = primary.Path
+			coverWidth = primary.Width
+			coverDuration = primary.DurationFinite()
+		} else {
+			coverVideoPath = s.Path
+		}
+		updatedAtUnix = s.UpdatedAt.Unix()
+
 		dto = toSceneDetailDTO(s, tags, performers, studio)
 		return nil
 	})
 	if err != nil {
 		return nil, err
+	}
+
+	if dto != nil && coverVideoPath != "" {
+		dto.CoverURL, dto.CoverWidth, dto.CoverHeight = a.ensureCover(
+			context.Background(), dto.ID, coverVideoPath, coverWidth, coverDuration, updatedAtUnix,
+		)
 	}
 
 	logger.Infof("查询场景详情: id=%d", id)
