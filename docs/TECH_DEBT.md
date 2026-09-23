@@ -3,6 +3,25 @@
 记录已知但未处理的取舍与缺口。按类别归档，不要求当前处理。
 
 > 媒体扫描模式 / 附件机制 / 图片集的设计与待决策项见 `docs/DESIGN_MEDIA_SCAN.md`。
+> 健康度基线扫描（死代码/表/硬规则/注释/命名）见 `docs/HEALTH_SCAN.md`。
+
+## 偿还时机清单（来自 HEALTH_SCAN.md）
+
+只列有明确偿还时机的条目；其余见 `docs/HEALTH_SCAN.md`。
+
+| 项 | 偿还时机 |
+|---|---|
+| `context.TODO()` 19 处（冻结区 `manager`/`ffmpeg`） | 阶段 5 |
+| `signedurl` 函数级零引用（仅常量被 `ffmpeg` 用） | 阶段 3 抽查流媒体功能 |
+| `group` / `savedfilter` UI 未暴露 | 阶段 3 决定是否进核心业务 |
+| `scraper` / `match` 待评估（AGENTS：暂留不再使用） | 阶段 4 插件桥设计时 |
+| `plugin/util` 零引用（仅 build-tag 示例依赖） | 阶段 4 |
+| `session` 桌面端残留（`Get/SetCurrentUserID` 等） | 阶段 7 |
+| 数据库停用表（`saved_filters`、`groups*`、`scene_markers*`、`galleries_chapters`、`video_captions`） | 阶段 7（删表需新迁移） |
+| TODO 注释 132 处 / `deprecated` 标记 58 处 | 阶段 7 |
+| 小写 `stash` 106 处（多为注释/测试夹具） | 阶段 7 |
+
+相关决策见 `docs/ARCHITECTURE.md` ADR-009。
 
 ## 功能性缺口
 

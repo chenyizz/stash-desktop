@@ -129,3 +129,22 @@ type LibraryMode struct {
 - 需要音频等其他模式 → 扩展 flags。
 
 参考：`docs/DESIGN_MEDIA_SCAN.md`（草案）。
+
+## ADR-009：StashID 与停用概念的偿还时机
+
+决策：`StashID/StashIDs/stash_id`、Group、SavedFilter、SceneMarker，以及 `scraper`/`match` 子系统，**当前保留现有代码和数据库表**，不在命名清理步骤（阶段 5）中处理。
+
+偿还时机：
+
+- 阶段 3：`group` / `savedfilter` 决定是否进核心业务；`signedurl` 抽查流媒体功能。
+- 阶段 4：`scraper` / `match` 随插件桥设计评估；`plugin/util` 随示例决定。
+- 阶段 5：`context.TODO()` 19 处收敛。
+- 阶段 7：`session` 桌面端残留、数据库停用表（需新迁移）、TODO 132 / deprecated 58、小写 `stash` 注释与夹具。
+
+理由：
+
+- 当前无功能依赖，重构收益为零。
+- 现在拍板结构可能拍错（插件桥尚未定型）。
+- 明确偿还时机，不是"忘了改"。
+
+完整清单：`docs/TECH_DEBT.md`「偿还时机清单」与 `docs/HEALTH_SCAN.md`。

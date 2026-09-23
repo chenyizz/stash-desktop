@@ -17,7 +17,7 @@ func main() {
 
 	wailsApp := application.New(application.Options{
 		Name:        "case",
-		Description: "Desktop media organizer powered by Stash",
+		Description: "Desktop media organizer powered by Case",
 		Services: []application.Service{
 			application.NewService(appService),
 		},
