@@ -99,7 +99,7 @@ func (f *FFMpeg) initHWSupport(ctx context.Context) {
 		hwTestTimeout := hwTestTimeoutSecondsDefault * time.Second
 
 		// allow timeout to be overridden with environment variable
-		if timeout := os.Getenv("STASH_HW_TEST_TIMEOUT"); timeout != "" {
+		if timeout := os.Getenv("CASE_HW_TEST_TIMEOUT"); timeout != "" {
 			if seconds, err := strconv.Atoi(timeout); err == nil {
 				hwTestTimeout = time.Duration(seconds) * time.Second
 			}
@@ -186,7 +186,7 @@ func (f *FFMpeg) hwCanFullHWTranscode(ctx context.Context, codec VideoCodec, vf 
 // Prepend input for hardware encoding only
 func (f *FFMpeg) hwDeviceInit(args Args, toCodec VideoCodec, fullhw bool) Args {
 	// check for custom /dev/dri device #6435
-	driDevice := os.Getenv("STASH_HW_DRI_DEVICE")
+	driDevice := os.Getenv("CASE_HW_DRI_DEVICE")
 	if driDevice == "" {
 		driDevice = "/dev/dri/renderD128"
 	}

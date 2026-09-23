@@ -31,7 +31,7 @@ const (
 	dbConnTimeout = 30 * time.Second
 
 	// environment variable to set the cache size
-	cacheSizeEnv = "STASH_SQLITE_CACHE_SIZE"
+	cacheSizeEnv = "CASE_SQLITE_CACHE_SIZE"
 )
 
 var appSchemaVersion uint = 86

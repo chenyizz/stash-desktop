@@ -79,5 +79,4 @@
 - **评估项：`StashID` / `StashIDs` / `stash_id`**（1300+ 处，60+ 文件）。当前视为领域术语（stash-box 的外部 ID），**暂不改**。如未来接入其他元数据源，考虑改为 `ExternalID`，届时与 scraper 子系统一起做。
 - **长期项：数据库表名/列名** `scene_stash_ids`、`tag_stash_ids`、`performer_stash_ids`、`studio_stash_ids`、`group_stash_ids` 及列 `stash_id` / `endpoint`。暂不改（迁移风险），随 `StashID` 评估项一并处理。
 - `StashBox` / `StashBoxInput` / `GetStashBoxes` 保留（stash-box 协议专有名词）。
-- **环境变量保留旧名**：`STASH_HW_TEST_TIMEOUT`、`STASH_HW_DRI_DEVICE`（`backend/pkg/ffmpeg`）、`STASH_SQLITE_CACHE_SIZE`（`backend/pkg/sqlite`）仍是旧名，位于冻结区，单独做太碎——与 Step 5 第三级标识符清理一起处理（届时加 `CASE_` 回退）。
-- 命名清理已分批完成：第一级用户可见字符串、第二级配置键/环境变量、第三级 `StashConfig→LibraryConfig`、`GetStashHomeDirectory→GetCaseHomeDirectory`、`stashignore→caseignore`（磁盘文件 `.caseignore`，未保留旧 `.stashignore` 兼容）。
+- 命名清理已分批完成：第一级用户可见字符串、第二级配置键/环境变量（含 `CASE_HW_TEST_TIMEOUT`、`CASE_HW_DRI_DEVICE`、`CASE_SQLITE_CACHE_SIZE`）、第三级 `StashConfig→LibraryConfig`、`GetStashHomeDirectory→GetCaseHomeDirectory`、`stashignore→caseignore`（磁盘文件 `.caseignore`，未保留旧 `.stashignore` 兼容）。
