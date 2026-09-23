@@ -6,7 +6,7 @@
 
 - [x] Go 重写 NFO 解析：`backend/pkg/metadata/nfo/`
 - [x] 扫描时自动读 NFO
-- [ ] `GetScene(id)` 返回完整 DTO
+- [x] `GetScene(id)` 返回完整 DTO
 - [ ] 详情页 Svelte 组件
 - [ ] hash 路由：列表 ↔ 详情
 

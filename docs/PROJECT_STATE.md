@@ -19,6 +19,7 @@
 - 场景列表显示：1 条记录
 - NFO 解析模块：`backend/pkg/metadata/nfo/`（解析 + `SceneMetadata` 映射 + 11 用例）
 - 扫描时自动读 NFO 并回填场景元数据（`nfo.Applier`，只填不覆盖）
+- `GetScene(id)` 返回完整 `SceneDetailDTO`（元数据 + 结构化 tags/performers + files）
 
 ## 当前焦点
 
@@ -26,13 +27,11 @@
 
 ## 下一步
 
-1. `GetScene(id)` 返回完整 DTO
-2. 详情页 Svelte 组件
-3. 封面图：AssetServer
+1. 详情页 Svelte 组件
+2. 封面图：AssetServer
 
 ## 已知问题
 
-- `SceneDTO` 只有 ID + Title，缺元数据
 - 同场景多文件首次扫描时，标量字段由并行扫描完成顺序决定，后续扫描不改变。如需确定性优先级，阶段 3+ 再设计
 - 扫描完成用 `setTimeout` 等，不可靠
 - 无分页
@@ -41,6 +40,7 @@
 
 ## 最近变更
 
+- 新增 `GetScene` 详情 DTO：tags/performers 结构化（ID+Name），files 含 duration/分辨率/codec
 - 扫描接入 NFO：scene post-commit hook 调用 `nfo.Applier`，只填不覆盖、关系只增
 - 完成 NFO 解析模块（Go 原生，含映射与测试）
 - 完成扫描 → 写库

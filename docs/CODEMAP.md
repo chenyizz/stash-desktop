@@ -153,19 +153,18 @@ func DateFromYear(year int) Date
 | 文件               | 职责                                                         |
 | ------------------ | ------------------------------------------------------------ |
 | `app.go`           | Wails `ServiceStartup`、`ScanLibrary` / `FindScenes`、`SceneDTO` 定义 |
+| `scene.go`         | `GetScene` / `SceneDetailDTO` / `TagDTO` / `PerformerDTO` / `SceneFileDTO` |
 | `config.go`        | 配置初始化（`setupConfig`）                                  |
 | `logging.go`       | 日志初始化与 UI Handler                                      |
-| `paths.go`         | 数据目录布局（`ResolveLayout`）                              |
-| `wails_emitter.go` | 事件/日志推送适配                                            |
+| `paths.go` / `wails_emitter.go` | 数据目录布局、事件/日志推送适配             |
 
 **规则**：只做胶水，不写业务逻辑。导出方法首字母大写才会暴露给前端。
 
 ### frontend/src/
 
-| 路径         | 职责                   |
-| ------------ | ---------------------- |
-| `App.svelte` | 主界面（当前唯一页面） |
-| `main.ts`    | 入口挂载               |
+| 路径                      | 职责                   |
+| ------------------------- | ---------------------- |
+| `App.svelte` / `main.ts`  | 主界面与入口挂载       |
 
 ---
 
@@ -195,6 +194,7 @@ git diff --name-only HEAD -- backend/manager backend/pkg  # 找冻结区改动
 
 | 日期       | 变更                                                         |
 | ---------- | ------------------------------------------------------------ |
+| 2026-09-23 | 阶段 2.4.3：`internal/app/scene.go` 新增 `GetScene` / `SceneDetailDTO` |
 | 2026-09-23 | 阶段 2.4.2：新增 `nfo/applier.go` 并在 `scene.ScanHandler` post-commit 接入 |
 | 2026-09-23 | 复核实际文件：修正 models 类型摘要、internal/app 与 frontend 清单，补 `ffmpeg` / `manager/config` / `scene` 模块，合并 utils/fsutil |
 | 2026-09-23 | 创建，加入 `metadata/nfo/` 模块                              |

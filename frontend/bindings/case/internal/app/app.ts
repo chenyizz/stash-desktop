@@ -28,6 +28,13 @@ export function GetDataDir(): $CancellablePromise<string> {
 }
 
 /**
+ * GetScene returns the full detail DTO for a single scene.
+ */
+export function GetScene(id: number): $CancellablePromise<$models.SceneDetailDTO | null> {
+    return $Call.ByID(3442445960, id);
+}
+
+/**
  * GetSystemStatus 简单状态查询（验证 Manager 是否活着）
  */
 export function GetSystemStatus(): $CancellablePromise<{ [_ in string]?: any } | null> {

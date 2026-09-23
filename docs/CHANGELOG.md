@@ -1,5 +1,34 @@
 # CHANGELOG
 
+## 2026-09-23（阶段 2.4.3 - GetScene 完整 DTO）
+
+### 新增
+
+- `internal/app/scene.go`：`GetScene(id)` 返回 `SceneDetailDTO`（标量元数据 + `StudioName` + 结构化 `Tags []TagDTO` / `Performers []PerformerDTO` + URLs + 主文件便利字段 + `files[]`）
+- `internal/app/scene_test.go`：`toSceneDetailDTO` 纯映射 5 个用例（完整场景、空关联/nil 字段、Inf/NaN、竖屏分辨率、resolutionLabel）
+
+### 修改
+
+- 无（未触碰冻结区；`SceneDTO` / `FindScenes` 保持不变，列表仍轻量）
+
+### 修复
+
+- 无
+
+### 验证
+
+- `gofmt -l internal/app`：`scene.go` / `scene_test.go` 无输出（其余 `internal/app` 既有文件未格式化，与本次无关）
+- `go vet ./internal/app/...`：通过
+- `go test ./internal/app/... -v`：5 个用例全部 PASS
+- `go build ./...`：通过
+- `wails3 dev`：构建成功、绑定生成包含 `GetScene` / `SceneDetailDTO` / `TagDTO` / `PerformerDTO`、WebView2 启动成功
+
+### 决策
+
+- `Rating` 用 `int`：0 表示「无评分」（有效范围 1-100）
+- `Duration`/`FrameRate` 用 `float64`：`DurationFinite()`/`FrameRateFinite()` 将 Inf/NaN 归零，0 表示「未知」
+- `resolution` 由 `min(width,height)` 派生为 `"1080p"` 形式，0 维度返回空串
+
 ## 2026-09-23（阶段 2.4.2 - 扫描时自动读 NFO）
 
 ### 新增
