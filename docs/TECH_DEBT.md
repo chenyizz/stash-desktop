@@ -2,8 +2,11 @@
 
 记录已知但未处理的取舍与缺口。按类别归档，不要求当前处理。
 
+> 媒体扫描模式 / 附件机制 / 图片集的设计与待决策项见 `docs/DESIGN_MEDIA_SCAN.md`。
+
 ## 功能性缺口
 
+- 附件机制未定：候选 A 文件系统直读 / B custom fields JSON 字符串 / C `scene_attachments` 表，阶段 3 详情页附件功能实现时决策（详见 `docs/DESIGN_MEDIA_SCAN.md` D2）。当前不做任何附件入库或索引。
 - 同场景多文件首次扫描时，标量字段由并行扫描完成顺序决定，后续扫描不改变。如需确定性优先级，阶段 3+ 再设计。
 - NFO 编码只支持 UTF-8 + BOM，无 Shift-JIS/GBK 回退。
 - NFO 解析 `Strict=true`，未转义 `&` 会导致整份失败。
@@ -40,3 +43,10 @@
 - Wails v3.0.0-beta.23 是 beta 版，上游可能有破坏性变更。
 - 冻结区策略导致 `backend/pkg` 长期无法重构，阶段 7 处理。
 - `internal/app` 可能随功能增加膨胀，需在阶段 3 前评估拆分。
+
+## 命名遗留（Stash）
+
+- **评估项：`StashID` / `StashIDs` / `stash_id`**（1300+ 处，60+ 文件）。当前视为领域术语（stash-box 的外部 ID），**暂不改**。如未来接入其他元数据源，考虑改为 `ExternalID`，届时与 scraper 子系统一起做。
+- **长期项：数据库表名/列名** `scene_stash_ids`、`tag_stash_ids`、`performer_stash_ids`、`studio_stash_ids`、`group_stash_ids` 及列 `stash_id` / `endpoint`。暂不改（迁移风险），随 `StashID` 评估项一并处理。
+- `StashBox` / `StashBoxInput` / `GetStashBoxes` 保留（stash-box 协议专有名词）。
+- 命名清理分批计划：第一级用户可见字符串（立改）；第二级配置键/环境变量（兼容旧名）；第三级标识符（按包，`StashConfig→LibraryConfig` 与扫描模式 D1 同批、`stashignore→caseignore` 兼容旧文件）；第四级数据库表名（不改，见上）；第五级 blob 路径（无残留，不动）。
