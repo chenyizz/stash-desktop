@@ -92,7 +92,6 @@ func (a *App) GetScene(id int) (*SceneDetailDTO, error) {
 	var coverVideoPath string
 	var coverWidth int
 	var coverDuration float64
-	var updatedAtUnix int64
 
 	err := a.mgr.Repository.WithReadTxn(context.Background(), func(ctx context.Context) error {
 		s, err := a.mgr.Repository.Scene.Find(ctx, id)
@@ -129,7 +128,6 @@ func (a *App) GetScene(id int) (*SceneDetailDTO, error) {
 		} else {
 			coverVideoPath = s.Path
 		}
-		updatedAtUnix = s.UpdatedAt.Unix()
 
 		dto = toSceneDetailDTO(s, tags, performers, studio)
 		return nil
@@ -140,7 +138,7 @@ func (a *App) GetScene(id int) (*SceneDetailDTO, error) {
 
 	if dto != nil && coverVideoPath != "" {
 		dto.CoverURL, dto.CoverWidth, dto.CoverHeight = a.ensureCover(
-			context.Background(), dto.ID, coverVideoPath, coverWidth, coverDuration, updatedAtUnix,
+			context.Background(), dto.ID, coverVideoPath, coverWidth, coverDuration,
 		)
 	}
 

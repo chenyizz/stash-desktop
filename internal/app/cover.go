@@ -11,6 +11,7 @@ import (
 
 	"github.com/wailsapp/wails/v3/pkg/application"
 
+	"case/backend/pkg/hash/md5"
 	"case/backend/pkg/logger"
 	"case/backend/pkg/metadata/cover"
 	"case/backend/pkg/scene/generate"
@@ -22,7 +23,7 @@ const coverURLPrefix = "/covers/"
 // ensureCover returns the URL and dimensions of a scene's cover, generating and
 // persisting one on demand when none exists yet. Failures are logged and
 // reported as an empty URL so the detail page can fall back to a placeholder.
-func (a *App) ensureCover(ctx context.Context, sceneID int, videoPath string, width int, duration float64, updatedAtUnix int64) (string, int, int) {
+func (a *App) ensureCover(ctx context.Context, sceneID int, videoPath string, width int, duration float64) (string, int, int) {
 	data, err := a.readCover(ctx, sceneID)
 	if err != nil {
 		logger.Warnf("读取封面失败 scene=%d: %v", sceneID, err)
@@ -49,12 +50,17 @@ func (a *App) ensureCover(ctx context.Context, sceneID int, videoPath string, wi
 		return "", 0, 0
 	}
 
-	coverWidth, coverHeight := 0, 0
-	if cfg, _, decodeErr := image.DecodeConfig(bytes.NewReader(data)); decodeErr == nil {
-		coverWidth, coverHeight = cfg.Width, cfg.Height
+	cfg, _, decodeErr := image.DecodeConfig(bytes.NewReader(data))
+	if decodeErr != nil {
+		logger.Warnf("封面无法解码，改用占位 scene=%d: %v", sceneID, decodeErr)
+		return "", 0, 0
 	}
 
-	return fmt.Sprintf("%s%d?v=%d", coverURLPrefix, sceneID, updatedAtUnix), coverWidth, coverHeight
+	// The blob checksum is md5(bytes), so this changes whenever the cover does,
+	// regardless of whether scenes.updated_at was touched.
+	checksum := md5.FromBytes(data)
+
+	return fmt.Sprintf("%s%d?v=%s", coverURLPrefix, sceneID, checksum[:8]), cfg.Width, cfg.Height
 }
 
 func (a *App) readCover(ctx context.Context, sceneID int) ([]byte, error) {

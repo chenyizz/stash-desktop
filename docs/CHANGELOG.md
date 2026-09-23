@@ -1,5 +1,30 @@
 # CHANGELOG
 
+## 2026-09-23（阶段 2 收尾）
+
+### 修改
+
+- `internal/app/cover.go`：`CoverURL` 缓存参数由 `?v=<updatedAt>` 改为 `?v=<md5(bytes)[:8]>`（`UpdateCover` 不更新 `scenes.updated_at`）；`image.DecodeConfig` 失败时置空 URL，走占位 box
+- `internal/app/scene.go`：移除不再需要的 `updatedAt` 传递
+- `docs/PROJECT_STATE.md`：标记阶段 2 完成，焦点转阶段 3；已知问题精简为阶段 3 相关，其余指向 `docs/TECH_DEBT.md`
+- `docs/ROADMAP.md`：阶段 2 全部勾选；封面缩略图顺延到阶段 3
+
+### 新增
+
+- `backend/pkg/metadata/cover/cover_test.go`：新增真实 FFmpeg E2E 用例 `TestResolve_FFmpegRealFrame`（生成测试视频 → 20% 截帧 → 解码校验；无 ffmpeg 时 skip）
+
+### 验证
+
+- `gofmt` / `go vet ./internal/app/... ./backend/pkg/metadata/cover/...`：通过
+- `go test ./backend/pkg/metadata/cover/...`：7 个用例（含真实 FFmpeg E2E）全部 PASS
+- `go test ./internal/app/... ./backend/pkg/metadata/nfo/... ./backend/pkg/scene/...`：全部 PASS
+- `go build ./...`：通过
+- `wails3 dev`：构建成功、AssetServer middleware 生效、WebView2 启动成功
+
+### 说明
+
+- 端到端「扫描 → 列表 → 详情 → 封面 → 外部链接 → 返回」中的 **GUI 交互部分需人工点按确认**；自动化覆盖：构建、启动、封面策略链（含真实 FFmpeg）、NFO/场景单测。
+
 ## 2026-09-23（阶段 2.4.5 - 封面图）
 
 ### 新增
