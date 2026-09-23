@@ -16,14 +16,14 @@ import (
 	_ "case/backend/pkg/sqlite/migrations"
 )
 
-// stashIgnorePathFilter wraps StashIgnoreFilter to implement PathFilter for testing.
+// caseIgnorePathFilter wraps CaseIgnoreFilter to implement PathFilter for testing.
 // It provides a fixed library root for the filter.
-type stashIgnorePathFilter struct {
-	filter      *file.StashIgnoreFilter
+type caseIgnorePathFilter struct {
+	filter      *file.CaseIgnoreFilter
 	libraryRoot string
 }
 
-func (f *stashIgnorePathFilter) Accept(ctx context.Context, path string, info fs.FileInfo, zipFilePath string) bool {
+func (f *caseIgnorePathFilter) Accept(ctx context.Context, path string, info fs.FileInfo, zipFilePath string) bool {
 	return f.filter.Accept(ctx, path, info, f.libraryRoot, zipFilePath)
 }
 
@@ -41,16 +41,16 @@ func createTestFileOnDisk(t *testing.T, dir, name string) string {
 	return path
 }
 
-// createStashIgnoreFile creates a .stashignore file with the given content.
-func createStashIgnoreFile(t *testing.T, dir, content string) {
+// createCaseIgnoreFile creates a .caseignore file with the given content.
+func createCaseIgnoreFile(t *testing.T, dir, content string) {
 	t.Helper()
-	path := filepath.Join(dir, ".stashignore")
+	path := filepath.Join(dir, ".caseignore")
 	if err := os.WriteFile(path, []byte(content), 0644); err != nil {
-		t.Fatalf("failed to create .stashignore: %v", err)
+		t.Fatalf("failed to create .caseignore: %v", err)
 	}
 }
 
-func TestScannerWithStashIgnore(t *testing.T) {
+func TestScannerWithCaseIgnore(t *testing.T) {
 	// Create temp directory structure.
 	tmpDir := t.TempDir()
 
@@ -63,8 +63,8 @@ func TestScannerWithStashIgnore(t *testing.T) {
 	createTestFileOnDisk(t, tmpDir, "excluded_dir/video4.mp4")
 	createTestFileOnDisk(t, tmpDir, "temp/processing.mp4")
 
-	// Create .stashignore file.
-	stashignore := `# Ignore specific files
+	// Create .caseignore file.
+	caseignore := `# Ignore specific files
 ignore_me.mp4
 subdir/skip_this.mp4
 
@@ -72,17 +72,17 @@ subdir/skip_this.mp4
 excluded_dir/
 temp/
 `
-	createStashIgnoreFile(t, tmpDir, stashignore)
+	createCaseIgnoreFile(t, tmpDir, caseignore)
 
-	// Create stashignore filter with library root.
-	stashIgnoreFilter := &stashIgnorePathFilter{
-		filter:      file.NewStashIgnoreFilter(),
+	// Create caseignore filter with library root.
+	caseIgnoreFilter := &caseIgnorePathFilter{
+		filter:      file.NewCaseIgnoreFilter(),
 		libraryRoot: tmpDir,
 	}
 
 	// Create scanner.
 	scanner := &file.Scanner{
-		ScanFilters: []file.PathFilter{stashIgnoreFilter},
+		ScanFilters: []file.PathFilter{caseIgnoreFilter},
 	}
 
 	testScenarios := []struct {
@@ -114,7 +114,7 @@ temp/
 	}
 }
 
-func TestScannerWithNestedStashIgnore(t *testing.T) {
+func TestScannerWithNestedCaseIgnore(t *testing.T) {
 	// Create temp directory structure.
 	tmpDir := t.TempDir()
 
@@ -125,21 +125,21 @@ func TestScannerWithNestedStashIgnore(t *testing.T) {
 	createTestFileOnDisk(t, tmpDir, "subdir/sub.log")
 	createTestFileOnDisk(t, tmpDir, "subdir/sub.tmp")
 
-	// Root .stashignore excludes *.tmp.
-	createStashIgnoreFile(t, tmpDir, "*.tmp\n")
+	// Root .caseignore excludes *.tmp.
+	createCaseIgnoreFile(t, tmpDir, "*.tmp\n")
 
-	// Subdir .stashignore excludes *.log.
-	createStashIgnoreFile(t, filepath.Join(tmpDir, "subdir"), "*.log\n")
+	// Subdir .caseignore excludes *.log.
+	createCaseIgnoreFile(t, filepath.Join(tmpDir, "subdir"), "*.log\n")
 
-	// Create stashignore filter with library root.
-	stashIgnoreFilter := &stashIgnorePathFilter{
-		filter:      file.NewStashIgnoreFilter(),
+	// Create caseignore filter with library root.
+	caseIgnoreFilter := &caseIgnorePathFilter{
+		filter:      file.NewCaseIgnoreFilter(),
 		libraryRoot: tmpDir,
 	}
 
 	// Create scanner.
 	scanner := &file.Scanner{
-		ScanFilters: []file.PathFilter{stashIgnoreFilter},
+		ScanFilters: []file.PathFilter{caseIgnoreFilter},
 	}
 
 	testScenarios := []struct {
@@ -169,8 +169,8 @@ func TestScannerWithNestedStashIgnore(t *testing.T) {
 	}
 }
 
-func TestScannerWithoutStashIgnore(t *testing.T) {
-	// Create temp directory structure (no .stashignore).
+func TestScannerWithoutCaseIgnore(t *testing.T) {
+	// Create temp directory structure (no .caseignore).
 	tmpDir := t.TempDir()
 
 	// Create test files.
@@ -178,15 +178,15 @@ func TestScannerWithoutStashIgnore(t *testing.T) {
 	createTestFileOnDisk(t, tmpDir, "video2.mp4")
 	createTestFileOnDisk(t, tmpDir, "subdir/video3.mp4")
 
-	// Create stashignore filter with library root (but no .stashignore file exists).
-	stashIgnoreFilter := &stashIgnorePathFilter{
-		filter:      file.NewStashIgnoreFilter(),
+	// Create caseignore filter with library root (but no .caseignore file exists).
+	caseIgnoreFilter := &caseIgnorePathFilter{
+		filter:      file.NewCaseIgnoreFilter(),
 		libraryRoot: tmpDir,
 	}
 
 	// Create scanner.
 	scanner := &file.Scanner{
-		ScanFilters: []file.PathFilter{stashIgnoreFilter},
+		ScanFilters: []file.PathFilter{caseIgnoreFilter},
 	}
 
 	testScenarios := []struct {
@@ -224,21 +224,21 @@ func TestScannerWithNegationPattern(t *testing.T) {
 	createTestFileOnDisk(t, tmpDir, "keep_this.tmp")
 	createTestFileOnDisk(t, tmpDir, "video.mp4")
 
-	// Create .stashignore with negation.
-	stashignore := `*.tmp
+	// Create .caseignore with negation.
+	caseignore := `*.tmp
 !keep_this.tmp
 `
-	createStashIgnoreFile(t, tmpDir, stashignore)
+	createCaseIgnoreFile(t, tmpDir, caseignore)
 
-	// Create stashignore filter with library root.
-	stashIgnoreFilter := &stashIgnorePathFilter{
-		filter:      file.NewStashIgnoreFilter(),
+	// Create caseignore filter with library root.
+	caseIgnoreFilter := &caseIgnorePathFilter{
+		filter:      file.NewCaseIgnoreFilter(),
 		libraryRoot: tmpDir,
 	}
 
 	// Create scanner.
 	scanner := &file.Scanner{
-		ScanFilters: []file.PathFilter{stashIgnoreFilter},
+		ScanFilters: []file.PathFilter{caseIgnoreFilter},
 	}
 
 	testScenarios := []struct {

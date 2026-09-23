@@ -10,7 +10,7 @@ import (
 	"case/backend/pkg/file"
 )
 
-func createStashIgnoreTestFile(t *testing.T, path string) {
+func createCaseIgnoreTestFile(t *testing.T, path string) {
 	t.Helper()
 
 	if err := os.MkdirAll(filepath.Dir(path), 0755); err != nil {
@@ -22,14 +22,14 @@ func createStashIgnoreTestFile(t *testing.T, path string) {
 	}
 }
 
-func TestStashIgnoreUsesTopmostLibraryRootWithNestedLibraries(t *testing.T) {
+func TestCaseIgnoreUsesTopmostLibraryRootWithNestedLibraries(t *testing.T) {
 	root := filepath.Join(t.TempDir(), "library")
 	nested := filepath.Join(root, "images")
 	ignoredFile := filepath.Join(nested, "secret", "image.jpg")
 
-	createStashIgnoreTestFile(t, ignoredFile)
-	if err := os.WriteFile(filepath.Join(root, ".stashignore"), []byte("images/secret/\n"), 0644); err != nil {
-		t.Fatalf("failed to create .stashignore: %v", err)
+	createCaseIgnoreTestFile(t, ignoredFile)
+	if err := os.WriteFile(filepath.Join(root, ".caseignore"), []byte("images/secret/\n"), 0644); err != nil {
+		t.Fatalf("failed to create .caseignore: %v", err)
 	}
 
 	info, err := os.Stat(ignoredFile)
@@ -45,22 +45,22 @@ func TestStashIgnoreUsesTopmostLibraryRootWithNestedLibraries(t *testing.T) {
 	scannerFilter := &scanFilter{
 		stashPaths:        stashPaths,
 		generatedPath:     filepath.Join(root, "generated"),
-		stashIgnoreFilter: file.NewStashIgnoreFilter(),
+		caseIgnoreFilter: file.NewCaseIgnoreFilter(),
 	}
 
 	if scannerFilter.Accept(context.Background(), ignoredFile, info, "") {
-		t.Fatalf("expected scan filter to reject file due to parent .stashignore")
+		t.Fatalf("expected scan filter to reject file due to parent .caseignore")
 	}
 
 	cleanFilter := &cleanFilter{
 		scanFilter: scanFilter{
 			stashPaths:        stashPaths,
 			generatedPath:     filepath.Join(root, "generated"),
-			stashIgnoreFilter: file.NewStashIgnoreFilter(),
+			caseIgnoreFilter: file.NewCaseIgnoreFilter(),
 		},
 	}
 
 	if cleanFilter.Accept(context.Background(), ignoredFile, info, "") {
-		t.Fatalf("expected clean filter to reject file due to parent .stashignore")
+		t.Fatalf("expected clean filter to reject file due to parent .caseignore")
 	}
 }

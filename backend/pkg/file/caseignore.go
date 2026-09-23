@@ -8,21 +8,21 @@ import (
 	"strings"
 	"sync"
 
+	"case/backend/pkg/logger"
 	lru "github.com/hashicorp/golang-lru/v2"
 	ignore "github.com/sabhiram/go-gitignore"
-	"case/backend/pkg/logger"
 )
 
-const stashIgnoreFilename = ".stashignore"
+const caseIgnoreFilename = ".caseignore"
 
 // entriesCacheSize is the size of the LRU cache for collected ignore entries.
 // This cache stores the computed list of ignore entries per directory, avoiding
 // repeated directory tree walks for files in the same directory.
 const entriesCacheSize = 500
 
-// StashIgnoreFilter implements PathFilter to exclude files/directories
-// based on .stashignore files with gitignore-style patterns.
-type StashIgnoreFilter struct {
+// CaseIgnoreFilter implements PathFilter to exclude files/directories
+// based on .caseignore files with gitignore-style patterns.
+type CaseIgnoreFilter struct {
 	// cache stores compiled ignore patterns per directory.
 	cache sync.Map // map[string]*ignoreEntry
 	// entriesCache stores collected ignore entries per (dir, libraryRoot) pair.
@@ -38,24 +38,24 @@ type ignoreEntry struct {
 	dir string
 }
 
-// NewStashIgnoreFilter creates a new StashIgnoreFilter.
-func NewStashIgnoreFilter() *StashIgnoreFilter {
+// NewCaseIgnoreFilter creates a new CaseIgnoreFilter.
+func NewCaseIgnoreFilter() *CaseIgnoreFilter {
 	// Create the LRU cache for collected entries.
 	// Ignore error as it only fails if size <= 0.
 	entriesCache, _ := lru.New[string, []*ignoreEntry](entriesCacheSize)
-	return &StashIgnoreFilter{
+	return &CaseIgnoreFilter{
 		entriesCache: entriesCache,
 	}
 }
 
 // Accept returns true if the path should be included in the scan.
-// It checks for .stashignore files in the directory hierarchy and
+// It checks for .caseignore files in the directory hierarchy and
 // applies gitignore-style pattern matching.
-// The libraryRoot parameter bounds the search for .stashignore files -
+// The libraryRoot parameter bounds the search for .caseignore files -
 // only directories within the library root are checked.
 // zipFilepath is the path of the zip file if the file is inside a zip.
-// .stashignore files will not be read within zip files.
-func (f *StashIgnoreFilter) Accept(ctx context.Context, path string, info fs.FileInfo, libraryRoot string, zipFilePath string) bool {
+// .caseignore files will not be read within zip files.
+func (f *CaseIgnoreFilter) Accept(ctx context.Context, path string, info fs.FileInfo, libraryRoot string, zipFilePath string) bool {
 	// If no library root provided, accept the file (safety fallback).
 	if libraryRoot == "" {
 		return true
@@ -64,7 +64,7 @@ func (f *StashIgnoreFilter) Accept(ctx context.Context, path string, info fs.Fil
 	// Get the directory containing this path.
 	dir := filepath.Dir(path)
 
-	// If the file is inside a zip, use the zip file's directory as the base for .stashignore lookup.
+	// If the file is inside a zip, use the zip file's directory as the base for .caseignore lookup.
 	if zipFilePath != "" {
 		dir = filepath.Dir(zipFilePath)
 	}
@@ -72,7 +72,7 @@ func (f *StashIgnoreFilter) Accept(ctx context.Context, path string, info fs.Fil
 	// Collect all applicable ignore entries from library root to this directory.
 	entries := f.collectIgnoreEntries(dir, libraryRoot)
 
-	// If no .stashignore files found, accept the file.
+	// If no .caseignore files found, accept the file.
 	if len(entries) == 0 {
 		return true
 	}
@@ -103,7 +103,7 @@ func (f *StashIgnoreFilter) Accept(ctx context.Context, path string, info fs.Fil
 // It walks up the directory tree from dir to libraryRoot and returns entries in order
 // from root to most specific. Results are cached to avoid repeated computation for
 // files in the same directory.
-func (f *StashIgnoreFilter) collectIgnoreEntries(dir string, libraryRoot string) []*ignoreEntry {
+func (f *CaseIgnoreFilter) collectIgnoreEntries(dir string, libraryRoot string) []*ignoreEntry {
 	// Clean paths for consistent comparison and cache key generation.
 	dir = filepath.Clean(dir)
 	libraryRoot = filepath.Clean(libraryRoot)
@@ -122,7 +122,7 @@ func (f *StashIgnoreFilter) collectIgnoreEntries(dir string, libraryRoot string)
 		if isPathInOrEqual(libraryRoot, parent) {
 			parentKey := parent + "\x00" + libraryRoot
 			if parentEntries, ok := f.entriesCache.Get(parentKey); ok {
-				// Parent is cached - just check if current dir has a .stashignore.
+				// Parent is cached - just check if current dir has a .caseignore.
 				entries := parentEntries
 				if entry := f.getOrLoadIgnoreEntry(dir); entry != nil {
 					// Copy parent slice and append to avoid mutating cached slice.
@@ -168,7 +168,7 @@ func (f *StashIgnoreFilter) collectIgnoreEntries(dir string, libraryRoot string)
 		dirs[i], dirs[j] = dirs[j], dirs[i]
 	}
 
-	// Check each directory for .stashignore files.
+	// Check each directory for .caseignore files.
 	var entries []*ignoreEntry
 	for _, d := range dirs {
 		if entry := f.getOrLoadIgnoreEntry(d); entry != nil {
@@ -192,7 +192,7 @@ func isPathInOrEqual(root, path string) bool {
 }
 
 // getOrLoadIgnoreEntry returns the cached ignore entry for a directory, or loads it.
-func (f *StashIgnoreFilter) getOrLoadIgnoreEntry(dir string) *ignoreEntry {
+func (f *CaseIgnoreFilter) getOrLoadIgnoreEntry(dir string) *ignoreEntry {
 	// Check cache first.
 	if cached, ok := f.cache.Load(dir); ok {
 		entry := cached.(*ignoreEntry)
@@ -202,12 +202,12 @@ func (f *StashIgnoreFilter) getOrLoadIgnoreEntry(dir string) *ignoreEntry {
 		return entry
 	}
 
-	// Try to load .stashignore from this directory.
-	stashIgnorePath := filepath.Join(dir, stashIgnoreFilename)
-	patterns, err := f.loadIgnoreFile(stashIgnorePath)
+	// Try to load .caseignore from this directory.
+	caseIgnorePath := filepath.Join(dir, caseIgnoreFilename)
+	patterns, err := f.loadIgnoreFile(caseIgnorePath)
 	if err != nil {
 		if !os.IsNotExist(err) {
-			logger.Warnf("Failed to load .stashignore from %s: %v", dir, err)
+			logger.Warnf("Failed to load .caseignore from %s: %v", dir, err)
 		}
 		f.cache.Store(dir, &ignoreEntry{patterns: nil, dir: dir})
 		return nil
@@ -218,7 +218,7 @@ func (f *StashIgnoreFilter) getOrLoadIgnoreEntry(dir string) *ignoreEntry {
 		return nil
 	}
 
-	logger.Debugf("Loaded .stashignore from %s", dir)
+	logger.Debugf("Loaded .caseignore from %s", dir)
 
 	entry := &ignoreEntry{
 		patterns: patterns,
@@ -228,8 +228,8 @@ func (f *StashIgnoreFilter) getOrLoadIgnoreEntry(dir string) *ignoreEntry {
 	return entry
 }
 
-// loadIgnoreFile loads and compiles a .stashignore file.
-func (f *StashIgnoreFilter) loadIgnoreFile(path string) (*ignore.GitIgnore, error) {
+// loadIgnoreFile loads and compiles a .caseignore file.
+func (f *CaseIgnoreFilter) loadIgnoreFile(path string) (*ignore.GitIgnore, error) {
 	data, err := os.ReadFile(path)
 	if err != nil {
 		return nil, err

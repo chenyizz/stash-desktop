@@ -568,7 +568,7 @@ type scanFilter struct {
 	videoExcludeRegex []*regexp.Regexp
 	imageExcludeRegex []*regexp.Regexp
 	minModTime        time.Time
-	stashIgnoreFilter *file.StashIgnoreFilter
+	caseIgnoreFilter  *file.CaseIgnoreFilter
 }
 
 func newScanFilter(c *config.Config, repo models.Repository, minModTime time.Time) *scanFilter {
@@ -580,7 +580,7 @@ func newScanFilter(c *config.Config, repo models.Repository, minModTime time.Tim
 		videoExcludeRegex: generateRegexps(c.GetExcludes()),
 		imageExcludeRegex: generateRegexps(c.GetImageExcludes()),
 		minModTime:        minModTime,
-		stashIgnoreFilter: file.NewStashIgnoreFilter(),
+		caseIgnoreFilter:  file.NewCaseIgnoreFilter(),
 	}
 }
 
@@ -601,9 +601,9 @@ func (f *scanFilter) Accept(ctx context.Context, path string, info fs.FileInfo, 
 		return false
 	}
 
-	// Check .stashignore files, bounded to the library root.
-	if !f.stashIgnoreFilter.Accept(ctx, path, info, f.libPaths.GetLibraryRootFromDirPath(path), zipFilePath) {
-		logger.Debugf("Skipping %s due to .stashignore", path)
+	// Check .caseignore files, bounded to the library root.
+	if !f.caseIgnoreFilter.Accept(ctx, path, info, f.libPaths.GetLibraryRootFromDirPath(path), zipFilePath) {
+		logger.Debugf("Skipping %s due to .caseignore", path)
 		return false
 	}
 

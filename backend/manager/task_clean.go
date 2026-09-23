@@ -155,7 +155,7 @@ func newCleanFilter(c *config.Config) *cleanFilter {
 			generatedPath:     c.GetGeneratedPath(),
 			videoExcludeRegex: generateRegexps(c.GetExcludes()),
 			imageExcludeRegex: generateRegexps(c.GetImageExcludes()),
-			stashIgnoreFilter: file.NewStashIgnoreFilter(),
+			caseIgnoreFilter:  file.NewCaseIgnoreFilter(),
 		},
 	}
 }
@@ -184,9 +184,9 @@ func (f *cleanFilter) Accept(ctx context.Context, path string, info fs.FileInfo,
 		return false
 	}
 
-	// Check .stashignore files, bounded to the library root.
-	if !f.stashIgnoreFilter.Accept(ctx, path, info, f.libPaths.GetLibraryRootFromDirPath(path), zipFilePath) {
-		logger.Infof("%s is excluded due to .stashignore. Marking to clean: %q", fileOrFolder, path)
+	// Check .caseignore files, bounded to the library root.
+	if !f.caseIgnoreFilter.Accept(ctx, path, info, f.libPaths.GetLibraryRootFromDirPath(path), zipFilePath) {
+		logger.Infof("%s is excluded due to .caseignore. Marking to clean: %q", fileOrFolder, path)
 		return false
 	}
 
