@@ -37,6 +37,21 @@ Svelte 前端
 前端不直接依赖 `backend/pkg`。  
 前端只认 `internal/app` 返回的 DTO。
 
+## internal/app 目标结构
+
+阶段 3 按新结构放置新增文件；已有文件在阶段 3 适当时机迁移，不强制一次完成。
+
+```text
+internal/app/
+├─ dto/          ← DTO 定义（SceneDetailDTO、TagDTO、PerformerDTO 等）
+├─ service/      ← 领域服务（scene.go、performer.go、tag.go、studio.go）
+├─ middleware/   ← AssetServer 中间件（CoverMiddleware 等）
+├─ infra/        ← 基础设施（config.go、logging.go、paths.go、wails_emitter.go）
+└─ app.go        ← ServiceStartup + Wails 方法注册
+```
+
+文件迁移规则：见 `docs/FROZEN_RULES.md`（移动已有文件需 Plan + 人工确认）。
+
 ## 状态管理
 
 - 客户端状态：Zustand

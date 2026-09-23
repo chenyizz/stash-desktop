@@ -83,6 +83,7 @@
       8. 数据目录策略：exe 同目录可写则用 exe 目录；不可写则降级到 `%LOCALAPPDATA%\case`。
       9. Blob 存储默认 `FILESYSTEM`，不存数据库。
    10. 日志用 `logger.Infof` / `logger.Debugf` / `logger.Errorf`，不要用 `fmt.Printf` 或标准库 `log`。
+   11. 冻结区改动规则（允许/禁止边界）见 `docs/FROZEN_RULES.md`。改冻结区前先读该文件，再决定是「直接做」还是「Plan + 人工确认」。
    
    ## 5. 效率规则（减少 token 消耗）   <!-- 新增 -->
    
@@ -146,6 +147,10 @@
       - 架构决策：`docs/ARCHITECTURE.md`
       - 代码约定：`docs/CONVENTIONS.md`
       - 路线图：`docs/ROADMAP.md`
+      - 技术债：`docs/TECH_DEBT.md`
+      - 媒体扫描设计：`docs/DESIGN_MEDIA_SCAN.md`
+      - 健康度基线扫描：`docs/HEALTH_SCAN.md`
+      - 冻结区改动规则：`docs/FROZEN_RULES.md`
    
       ## 10. Agent 收尾协议
    
