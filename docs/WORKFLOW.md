@@ -7,6 +7,7 @@
 1. `AGENTS.md`
 2. `docs/PROJECT_STATE.md`
 3. `docs/WORKFLOW.md`
+4. `docs/CODEMAP.md`
 
 然后要求它复述：
 

@@ -27,9 +27,9 @@ Case/
 │     ├─ logger/        # 日志
 │     ├─ utils/         # 通用工具
 │     ├─ fsutil/        # 文件系统工具
-│     └─ metadata/nfo/  # NFO 解析（新增，阶段 2.4.1）
+│     └─ metadata/      # nfo 解析 + cover 策略链（阶段 2.4）
 ├─ internal/app/        # Wails 服务层
-├─ frontend/            # bindings/ + src/（目前仅 App.svelte、main.ts）
+├─ frontend/            # bindings/（生成）+ src/（App.svelte、lib/router、lib/components）
 └─ docs/
 ```
 
