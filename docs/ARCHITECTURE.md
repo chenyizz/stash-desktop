@@ -92,17 +92,28 @@
 
 ## ADR-008：媒体扫描模式
 
-决策：库路径使用显式 `LibraryMode`（mode + flags，**非三选一枚举**）；图片集**复用 Gallery**（一个最小文件夹 = 一个图片集）；附件机制**待阶段 3 决策**。
+决策：库路径使用显式 `LibraryMode`（**双布尔 flags，非三选一枚举**）：
+
+```go
+type LibraryMode struct {
+    Videos      bool // 是否扫描视频文件
+    Images      bool // 是否扫描图片文件
+    Attachments bool // 识别 fanart/extra/poster 作为附件
+}
+```
+
+图片集**复用 Gallery**（一个最小文件夹 = 一个图片集）；附件机制**待阶段 3 决策**。
 
 理由：
 
-- 三选一枚举会随模式增加膨胀；flags 结构可扩展，且能表达「扫视频 + 带附件」。
+- 媒体类型当前只有视频/图片，双布尔覆盖全部组合（只视频/只图片/混合），且未来加音频、字幕是同一模式扩展；三选一枚举会随模式增加膨胀。
 - Gallery 已具备图片集所需的模型、关系、封面（`FolderID` 绑定一个文件夹，契合「最小文件夹 = 一集」）。
 - 附件当前没有「零成本且不带 hack」的实现，先记录候选方案，不提前欠债。
 
 约束：
 
-- `LibraryMode` 仅影响扫描分派与过滤；默认保持现有行为。
+- `LibraryMode` 仅影响扫描分派与过滤；默认 `{Videos:true, Images:true, Attachments:true}` 保持现有行为。
+- 配置校验要求 `Videos || Images`，两者皆 false 时返回错误「至少启用一种媒体类型」。
 - 图片集沿用 Gallery，不新增表；Gallery NFO 解析为新增包。
 - 附件当前**不入库、不索引**；候选：
   - A 文件系统直读（零冻结，代价是每次扫目录）
@@ -114,6 +125,7 @@
 
 - 需要例 2（多文件夹 = 一集）→ Gallery 分组或 ImageSet。
 - 附件需要元数据/搜索/统计 → 选方案 C。
+- 媒体类型超过 5 种或需要互斥组合 → 升级为枚举 + 集合。
 - 需要音频等其他模式 → 扩展 flags。
 
 参考：`docs/DESIGN_MEDIA_SCAN.md`（草案）。

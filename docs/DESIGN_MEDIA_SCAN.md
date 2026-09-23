@@ -24,23 +24,23 @@
 
 ## 3. 决策记录
 
-### D1 库路径用 mode + flags，不用三选一枚举
+### D1 库路径用双布尔 flags，不用三选一枚举
 
 ```go
 type LibraryMode struct {
-    Primary     string // "video" | "image"
-    Attachments bool   // 识别 fanart/extra/poster 作为附件
-    // 将来可加 Audio bool 等
+    Videos      bool // 是否扫描视频文件
+    Images      bool // 是否扫描图片文件
+    Attachments bool // 识别 fanart/extra/poster 作为附件
+    // 将来可加 Audio bool / Subs bool 等
 }
 ```
 
-- 理由：三选一枚举将来加第四种模式会膨胀成 switch 长分支；flags 结构可扩展，且显式表达「扫视频 + 带附件」。
-- 默认：现有库迁移时保持兼容（见「开放点」）。
-- 影响：改 `backend/manager/config`（**冻结区**，需人工确认）。
+- 语义：只视频 `{Videos:true, Images:false}`；只图片 `{false,true}`；混合 `{true,true}`；都 false → **配置校验拒绝**（返回错误「至少启用一种媒体类型」）。
+- 默认：`Videos=true, Images=true, Attachments=true`（等价现状，兼容现有库）。
+- 理由：媒体类型当前只有视频/图片两种，双布尔覆盖全部组合；YAML 配置对普通用户直白；未来加音频/字幕是同一模式扩展。若将来媒体类型超过 5 种或需要互斥组合，再升级为枚举 + 集合（当前不做）。
+- 影响：改 `backend/manager/config`（**冻结区**，需人工确认），并加一行校验。
 
-**开放点（D1-a，待确认）**：模式 C（同时扫视频与图片）如何表达。候选：
-1. 双布尔 `Videos bool / Images bool`（推荐，能干净表达 A/B/C 与未来）；
-2. 保留 `Primary`，同目录配置两条 `LibraryMode`。
+**D1-a（已解决）**：模式 C（同时扫视频与图片）= `Videos && Images`，无需「同目录两条配置」。
 
 ### D2 附件机制：待决策项，本轮不定稿
 
@@ -81,7 +81,7 @@ type LibraryMode struct {
 1. **按 mode 注册 handler**（`backend/manager/task_scan.go getScanHandlers`）：
    - 视频模式：不注册 `image.ScanHandler`（图片不入库），仅 video handler。
    - 图片模式：不注册 video handler，仅 image handler。
-   - 混合（待 D1-a 决定表达）：两者都注册。
+   - 混合（`Videos && Images`）：两者都注册。
 2. **`scanFilter` 按 mode 过滤**：视频模式跳过 image/zip；图片模式跳过 video；尽量放在 manager 侧，减少改 `backend/pkg/file`。
 3. **图片模式**：最小文件夹 → folder-based Gallery（该模式下等价强制 `createGalleriesFromFolders`，`.nogallery`/`.forcegallery` 仍生效）。
 4. **Gallery NFO**：读取图片集 NFO 回填 `Gallery`（只填不覆盖，复用 2.4.2 Applier 思路）。
@@ -120,6 +120,5 @@ type LibraryMode struct {
 
 ## 11. 开放点
 
-- **D1-a**：混合模式如何表达（双布尔 vs 同目录两条配置）。
 - **D2**：附件机制 A/B/C 在阶段 3 决策。
 - Gallery NFO 命名约定（`folder.nfo` / 同名 `.nfo`）待定。
