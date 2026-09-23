@@ -26,7 +26,7 @@
         "build",
         "-tags", "dev",
         "-gcflags", "all=-N -l",
-        "-o", "build/bin/stash-desktop.exe"
+        "-o", "build/bin/case.exe"
       ],
       "dependsOn": ["npm install", "npm run build"]
     }

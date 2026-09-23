@@ -61,7 +61,7 @@ func getScanPaths(inputPaths []string) []*config.StashConfig {
 	for _, p := range inputPaths {
 		s := stashPaths.GetStashFromDirPath(p)
 		if s == nil {
-			logger.Warnf("%s is not in the configured stash paths", p)
+			logger.Warnf("%s is not in the configured case paths", p)
 			continue
 		}
 
@@ -86,7 +86,7 @@ func filterStashPaths(inputPaths []string) []string {
 	for _, p := range inputPaths {
 		s := stashPaths.GetStashFromDirPath(p)
 		if s == nil {
-			logger.Warnf("%s is not in the configured stash paths", p)
+			logger.Warnf("%s is not in the configured case paths", p)
 			continue
 		}
 

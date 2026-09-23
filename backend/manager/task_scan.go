@@ -597,7 +597,7 @@ func (f *scanFilter) Accept(ctx context.Context, path string, info fs.FileInfo, 
 
 	s := f.stashPaths.GetStashFromDirPath(path)
 	if s == nil {
-		logger.Debugf("Skipping %s as it is not in the stash library", path)
+		logger.Debugf("Skipping %s as it is not in the case library", path)
 		return false
 	}
 

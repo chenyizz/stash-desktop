@@ -175,7 +175,7 @@ func (f *cleanFilter) Accept(ctx context.Context, path string, info fs.FileInfo,
 	}
 
 	if stash == nil {
-		logger.Infof("%s not in any stash library directories. Marking to clean: %q", fileOrFolder, path)
+		logger.Infof("%s not in any case library directories. Marking to clean: %q", fileOrFolder, path)
 		return false
 	}
 
@@ -224,7 +224,7 @@ func (f *cleanFilter) shouldCleanFile(path string, info fs.FileInfo, stash *conf
 
 func (f *cleanFilter) shouldCleanVideoFile(path string, stash *config.StashConfig) bool {
 	if stash.ExcludeVideo {
-		logger.Infof("File in stash library that excludes video. Marking to clean: \"%s\"", path)
+		logger.Infof("File in case library that excludes video. Marking to clean: \"%s\"", path)
 		return true
 	}
 
@@ -238,7 +238,7 @@ func (f *cleanFilter) shouldCleanVideoFile(path string, stash *config.StashConfi
 
 func (f *cleanFilter) shouldCleanGallery(path string, stash *config.StashConfig) bool {
 	if stash.ExcludeImage {
-		logger.Infof("File in stash library that excludes images. Marking to clean: \"%s\"", path)
+		logger.Infof("File in case library that excludes images. Marking to clean: \"%s\"", path)
 		return true
 	}
 
@@ -252,7 +252,7 @@ func (f *cleanFilter) shouldCleanGallery(path string, stash *config.StashConfig)
 
 func (f *cleanFilter) shouldCleanImage(path string, stash *config.StashConfig) bool {
 	if stash.ExcludeImage {
-		logger.Infof("File in stash library that excludes images. Marking to clean: \"%s\"", path)
+		logger.Infof("File in case library that excludes images. Marking to clean: \"%s\"", path)
 		return true
 	}
 
