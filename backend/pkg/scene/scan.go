@@ -43,13 +43,21 @@ type ScanGenerator interface {
 	Generate(ctx context.Context, s *models.Scene, f *models.VideoFile) error
 }
 
+// ScanMetadataApplier applies local metadata (e.g. an NFO sidecar) to a scene
+// after the file transaction has been committed. It is optional: when nil, the
+// scan flow is unchanged.
+type ScanMetadataApplier interface {
+	Apply(ctx context.Context, sceneID int, videoPath string) error
+}
+
 type ScanHandler struct {
 	CreatorUpdater       ScanCreatorUpdater
 	GalleryFinderUpdater ScanGalleryFinderUpdater
 
-	ScanGenerator  ScanGenerator
-	CaptionUpdater video.CaptionUpdater
-	PluginCache    *plugin.Cache
+	ScanGenerator   ScanGenerator
+	MetadataApplier ScanMetadataApplier
+	CaptionUpdater  video.CaptionUpdater
+	PluginCache     *plugin.Cache
 
 	FileNamingAlgorithm models.HashAlgorithm
 	Paths               *paths.Paths
@@ -142,6 +150,12 @@ func (h *ScanHandler) Handle(ctx context.Context, f models.File, oldFile models.
 	// do this after the commit so that cover generation doesn't hold up the transaction
 	txn.AddPostCommitHook(ctx, func(ctx context.Context) {
 		for _, s := range existing {
+			if h.MetadataApplier != nil {
+				if err := h.MetadataApplier.Apply(ctx, s.ID, videoFile.Path); err != nil {
+					logger.Errorf("Error applying metadata for %s: %v", videoFile.Path, err)
+				}
+			}
+
 			if err := h.ScanGenerator.Generate(ctx, s, videoFile); err != nil {
 				// just log if cover generation fails. We can try again on rescan
 				logger.Errorf("Error generating content for %s: %v", videoFile.Path, err)

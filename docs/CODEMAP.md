@@ -1,0 +1,200 @@
+# 代码地图
+
+## 最后更新：2026-09-23（复核实际文件清单）
+
+## 维护规则
+
+- 新增、删除、重命名模块或关键文件时，Agent **必须**更新本文件。
+- 只放**定位信息**：路径、职责、关键类型摘要、搜索命令。
+- 不放实现细节、完整代码和易变行号；控制在 200 行以内，超出时下沉到 `docs/CONVENTIONS.md` / `docs/ARCHITECTURE.md`。
+
+---
+
+## 目录结构总览
+
+```text
+Case/
+├─ backend/
+│  ├─ manager/          # 总协调入口
+│  │  ├─ config/        # 配置读写与校验
+│  │  └─ task/          # 独立任务实现（迁移/清理等）
+│  └─ pkg/              # 业务域实现
+│     ├─ models/        # 领域模型
+│     ├─ sqlite/        # Repository 实现
+│     ├─ scene/         # 场景业务逻辑（ScanHandler / Service）
+│     ├─ file/          # 文件扫描（video/ 视频元数据装饰器）
+│     ├─ ffmpeg/        # FFmpeg / FFProbe 封装
+│     ├─ logger/        # 日志
+│     ├─ utils/         # 通用工具
+│     ├─ fsutil/        # 文件系统工具
+│     └─ metadata/nfo/  # NFO 解析（新增，阶段 2.4.1）
+├─ internal/app/        # Wails 服务层
+├─ frontend/            # bindings/ + src/（目前仅 App.svelte、main.ts）
+└─ docs/
+```
+
+---
+
+## 核心模块
+
+### backend/manager/
+
+| 文件            | 职责                                                       |
+| --------------- | ---------------------------------------------------------- |
+| `manager.go`    | Manager 初始化：SQLite 创建、迁移、FFmpeg 检测、NVENC 检测 |
+| `repository.go` | Repository 聚合入口，提供 `WithReadTxn` / `WithTxn`        |
+
+**注意**：冻结区。只允许在 `internal/app` 层调用，不要改内部结构。
+
+### backend/pkg/models/
+
+| 文件                 | 职责                                  |
+| -------------------- | ------------------------------------- |
+| `model_scene.go`     | `Scene`、`ScenePartial`、`RelatedIDs` |
+| `model_performer.go` | `Performer`、`PerformerPartial`       |
+| `model_tag.go`       | `Tag`、`TagPartial`                   |
+| `model_studio.go`    | `Studio`、`StudioPartial`             |
+| `date.go`            | `Date`、`ParseDate`、`DateFromYear`   |
+
+**核心类型摘要**（与 `backend/pkg/models` 一致）：
+
+```go
+// Scene（精简，model_scene.go）
+type Scene struct {
+    ID             int
+    Title          string
+    Code           string
+    Details        string
+    Director       string
+    Date           *Date          // 精度到日/月/年
+    ProductionDate *Date
+    Rating         *int           // 1-100
+    StudioID       *int
+    URLs           RelatedStrings
+    TagIDs         RelatedIDs
+    PerformerIDs   RelatedIDs
+    Groups         RelatedGroups
+    StashIDs       RelatedStashIDs
+    // transient（不入库）：Files / Path / OSHash / Checksum
+}
+// RelatedIDs：list 私有，只能经 List()/Add() 访问，由 Load* 懒加载。
+// Date（date.go）
+func ParseDate(s string) (Date, error)
+func DateFromYear(year int) Date
+```
+
+**Partial / Input**：`ScenePartial`、`CreateSceneInput`、`TagPartial`、`PerformerPartial`、`StudioPartial`。
+
+### backend/pkg/sqlite/
+
+| 文件           | 职责                                                         |
+| -------------- | ------------------------------------------------------------ |
+| `scene.go`     | `Scene` 的 Repository 实现，含 `Find` / `FindByID` / `UpdatePartial` |
+| `performer.go` | `Performer` Finder/Creator                                   |
+| `tag.go`       | `Tag` Finder/Creator                                         |
+| `studio.go`    | `Studio` Finder/Creator                                      |
+
+### backend/pkg/scene/
+
+| 文件                                    | 职责                              |
+| --------------------------------------- | --------------------------------- |
+| `scan.go`                               | `ScanHandler`：匹配/创建/关联场景；post-commit 调 `MetadataApplier` |
+| `create.go` / `update.go` / `import.go` | 创建、部分更新、JSON 导入         |
+| `query.go` / `service.go`               | 查询与 `Service` 聚合             |
+
+**注意**：冻结区。阶段 2.4.2 接入 NFO 时需人工确认。
+
+### backend/pkg/file/video/
+
+| 文件      | 职责                                                  |
+| --------- | ----------------------------------------------------- |
+| `scan.go` | `Decorator`：提取时长/分辨率/编解码等视频文件元数据 |
+
+**注意**：冻结区。
+
+### backend/pkg/ffmpeg/ 与 backend/manager/config/
+
+| 模块 / 文件                     | 职责                                      |
+| ------------------------------- | ----------------------------------------- |
+| `ffmpeg.go` / `ffprobe.go`      | FFmpeg / FFProbe 封装与路径探测           |
+| `codec.go` / `codec_hardware.go`| 编解码参数与硬件加速检测（NVENC 等）      |
+| `stream*.go` / `types.go`       | 转码、流式传输、公共类型与参数            |
+| `config.go` / `enums.go`        | `Config` 读写/校验、枚举（HashAlgorithm、BlobStorageType 等） |
+| `stash_config.go` / `tasks.go` / `ui.go` | 库路径、任务与 UI 配置           |
+
+**注意**：`backend/manager/config` 属冻结区。
+
+### backend/pkg/metadata/nfo/（新增）
+
+| 文件                          | 职责                                                         |
+| ----------------------------- | ------------------------------------------------------------ |
+| `movie.go` / `nfo.go`         | Kodi `<movie>` DTO；`Parse` / `ParseFile` / `FindForVideo`   |
+| `mapping.go`                  | `Movie → SceneMetadata` 纯映射                               |
+| `applier.go`                  | `Applier.Apply`：扫描后回填元数据（只填不覆盖，事务外 I/O）  |
+| `*_test.go` / `testdata/`     | 表驱动测试与样本                                             |
+
+### backend/pkg/logger/
+
+| 文件        | 职责                                                         |
+| ----------- | ------------------------------------------------------------ |
+| `logger.go` | `Infof` / `Debugf` / `Warnf` / `Errorf`，slog + 多 Handler + UI 推送 |
+
+### backend/pkg/utils/ 与 backend/pkg/fsutil/
+
+| 文件                                        | 职责                                     |
+| ------------------------------------------- | ---------------------------------------- |
+| `utils/strings.go` / `utils/date.go`        | 字符串工具、日期解析（`ParseDateStringAsTime`） |
+| `utils/phash.go` / `utils/image.go`         | 感知哈希 / 图像工具                      |
+| `utils/func.go` / `utils/map.go` / `utils/url.go` / `utils/vtt.go` | 其他通用工具 |
+| `fsutil/dir.go` / `fsutil/file.go`          | 目录 / 文件操作（含平台特定实现）        |
+
+### internal/app/
+
+| 文件               | 职责                                                         |
+| ------------------ | ------------------------------------------------------------ |
+| `app.go`           | Wails `ServiceStartup`、`ScanLibrary` / `FindScenes`、`SceneDTO` 定义 |
+| `config.go`        | 配置初始化（`setupConfig`）                                  |
+| `logging.go`       | 日志初始化与 UI Handler                                      |
+| `paths.go`         | 数据目录布局（`ResolveLayout`）                              |
+| `wails_emitter.go` | 事件/日志推送适配                                            |
+
+**规则**：只做胶水，不写业务逻辑。导出方法首字母大写才会暴露给前端。
+
+### frontend/src/
+
+| 路径         | 职责                   |
+| ------------ | ---------------------- |
+| `App.svelte` | 主界面（当前唯一页面） |
+| `main.ts`    | 入口挂载               |
+
+---
+
+## 常用搜索命令
+
+```bash
+rg "type Scene struct" backend/            # 找类型定义
+rg "func.*FindScenes" backend/ internal/   # 找函数定义
+rg "FindScenes\(" backend/ internal/       # 找调用点
+rg "SceneDTO" internal/ frontend/src/      # 找 DTO 字段
+git diff --name-only HEAD -- backend/manager backend/pkg  # 找冻结区改动
+```
+
+---
+
+## 探索规则
+
+1. **优先查本文件**，再决定读哪些源文件。
+2. **禁止** `Get-ChildItem -Recurse` 遍历整个目录。
+3. 找定义/调用用 `rg`，确认行号后再精确 `read_file`。
+4. 一次任务最多读 5 个文件、跑 3 条探索命令，然后必须出计划。
+5. 只读 `backend/pkg` 中与当前任务相关的包，不要全读。
+
+---
+
+## 变更日志（本文件）
+
+| 日期       | 变更                                                         |
+| ---------- | ------------------------------------------------------------ |
+| 2026-09-23 | 阶段 2.4.2：新增 `nfo/applier.go` 并在 `scene.ScanHandler` post-commit 接入 |
+| 2026-09-23 | 复核实际文件：修正 models 类型摘要、internal/app 与 frontend 清单，补 `ffmpeg` / `manager/config` / `scene` 模块，合并 utils/fsutil |
+| 2026-09-23 | 创建，加入 `metadata/nfo/` 模块                              |

@@ -19,6 +19,7 @@ import (
 	"case/backend/pkg/image"
 	"case/backend/pkg/job"
 	"case/backend/pkg/logger"
+	"case/backend/pkg/metadata/nfo"
 	"case/backend/pkg/models"
 	"case/backend/pkg/models/paths"
 	"case/backend/pkg/scene"
@@ -708,6 +709,7 @@ func getScanHandlers(options ScanMetadataInput, taskQueue *job.TaskQueue, progre
 				GalleryFinderUpdater: r.Gallery,
 				CaptionUpdater:       r.File,
 				PluginCache:          pluginCache,
+				MetadataApplier:      &nfo.Applier{Repo: mgr.Repository},
 				ScanGenerator: &sceneGenerators{
 					input:               options,
 					taskQueue:           taskQueue,
