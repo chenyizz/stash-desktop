@@ -45,6 +45,7 @@ const (
 	Username            = "username"
 	Password            = "password"
 	MaxSessionAge       = "max_session_age"
+	DataDir             = "data_dir"
 
 	SignedURLExpiry        = "signed_url_expiry"
 	signedURLExpiryDefault = 60 * 60 * 4 // 4 hours in seconds
@@ -563,6 +564,11 @@ func (i *Config) marshal() ([]byte, error) {
 // is set.
 func FileEnvSet() bool {
 	return os.Getenv("STASH_CONFIG_FILE") != ""
+}
+
+// GetDataDir 返回应用数据根目录。
+func (i *Config) GetDataDir() string {
+	return i.getString(DataDir)
 }
 
 // GetConfigFile returns the full path to the used configuration file.

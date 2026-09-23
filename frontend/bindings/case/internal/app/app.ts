@@ -10,7 +10,7 @@ import { Call as $Call, CancellablePromise as $CancellablePromise } from "@wails
 import * as application$0 from "../../../github.com/wailsapp/wails/v3/pkg/application/models.js";
 
 /**
- * GetDataDir 返回数据目录
+ * GetDataDir 返回数据目录（供前端调用）
  */
 export function GetDataDir(): $CancellablePromise<string> {
     return $Call.ByID(2677410815);
