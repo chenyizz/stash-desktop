@@ -11,11 +11,10 @@ import (
 	"case/backend/pkg/logger"
 )
 
-// setupLogging 初始化日志系统。
-// 可以在启动早期调用（用临时目录），也可以在配置加载后重新调用（用正式目录）。
-func setupLogging(logDir string, wailsApp *application.App) error {
+// setupLogging 初始化日志系统，返回底层 slog.Logger 供 Manager 使用。
+func setupLogging(logDir string, wailsApp *application.App) (*slog.Logger, error) {
 	if err := os.MkdirAll(logDir, 0o755); err != nil {
-		return fmt.Errorf("创建日志目录失败: %w", err)
+		return nil, fmt.Errorf("创建日志目录失败: %w", err)
 	}
 
 	logFile, err := os.OpenFile(
@@ -24,7 +23,7 @@ func setupLogging(logDir string, wailsApp *application.App) error {
 		0o644,
 	)
 	if err != nil {
-		return fmt.Errorf("打开日志文件失败: %w", err)
+		return nil, fmt.Errorf("打开日志文件失败: %w", err)
 	}
 
 	fileHandler := slog.NewJSONHandler(logFile, &slog.HandlerOptions{
@@ -32,8 +31,11 @@ func setupLogging(logDir string, wailsApp *application.App) error {
 	})
 	uiHandler := logger.NewUIHandler(&wailsEmitter{app: wailsApp}, slog.LevelInfo)
 
-	logger.Logger = logger.NewSlogLogger(
-		logger.NewMultiHandler(fileHandler, uiHandler),
-	)
-	return nil
+	multi := logger.NewMultiHandler(fileHandler, uiHandler)
+	slogLogger := slog.New(multi)
+
+	// 同时注册到全局 logger
+	logger.Logger = logger.NewSlogLogger(multi)
+
+	return slogLogger, nil
 }

@@ -9,11 +9,29 @@ import { Call as $Call, CancellablePromise as $CancellablePromise } from "@wails
 // @ts-ignore: Unused imports
 import * as application$0 from "../../../github.com/wailsapp/wails/v3/pkg/application/models.js";
 
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+// @ts-ignore: Unused imports
+import * as $models from "./models.js";
+
+/**
+ * FindScenes 分页查询场景列表。
+ */
+export function FindScenes(page: number, pageSize: number): $CancellablePromise<$models.SceneDTO[] | null> {
+    return $Call.ByID(3579858290, page, pageSize);
+}
+
 /**
  * GetDataDir 返回数据目录（供前端调用）
  */
 export function GetDataDir(): $CancellablePromise<string> {
     return $Call.ByID(2677410815);
+}
+
+/**
+ * GetSystemStatus 简单状态查询（验证 Manager 是否活着）
+ */
+export function GetSystemStatus(): $CancellablePromise<{ [_ in string]?: any } | null> {
+    return $Call.ByID(2642847171);
 }
 
 /**
@@ -28,6 +46,13 @@ export function GetVersion(): $CancellablePromise<string> {
  */
 export function Ping(): $CancellablePromise<string> {
     return $Call.ByID(2559294044);
+}
+
+/**
+ * ScanLibrary 触发扫描指定文件夹。返回 Job ID，前端可通过事件监听进度。
+ */
+export function ScanLibrary(path: string): $CancellablePromise<number> {
+    return $Call.ByID(1786151488, path);
 }
 
 export function SetApplication(wailsApp: application$0.App | null): $CancellablePromise<void> {

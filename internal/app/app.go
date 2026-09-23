@@ -3,14 +3,32 @@ package app
 import (
 	"context"
 	"fmt"
+	"log/slog"
 
 	"github.com/wailsapp/wails/v3/pkg/application"
 
+	"case/backend/manager"
+	"case/backend/manager/config"
 	"case/backend/pkg/logger"
+	"case/backend/pkg/models"
 )
 
 type App struct {
-	app *application.App
+	app    *application.App
+	cfg    *config.Config
+	mgr    *manager.Manager
+	logger *slog.Logger
+}
+
+type SceneDTO struct {
+	ID        int    `json:"id"`
+	Title     string `json:"title"`
+	Path      string `json:"path"`
+	OSHash    string `json:"oshash"`
+	Checksum  string `json:"checksum"`
+	Organized bool   `json:"organized"`
+	CreatedAt string `json:"createdAt"`
+	UpdatedAt string `json:"updatedAt"`
 }
 
 func New() *App {
@@ -30,9 +48,11 @@ func (a *App) ServiceStartup(ctx context.Context, options application.ServiceOpt
 	}
 
 	// 2. 初始化日志
-	if err := setupLogging(layout.LogDir, a.app); err != nil {
+	slogLogger, err := setupLogging(layout.LogDir, a.app)
+	if err != nil {
 		return err
 	}
+	a.logger = slogLogger
 
 	logger.Infof("Case 启动")
 	logger.Infof("根目录: %s", layout.BaseDir)
@@ -40,17 +60,39 @@ func (a *App) ServiceStartup(ctx context.Context, options application.ServiceOpt
 	logger.Infof("日志目录: %s", layout.LogDir)
 
 	// 3. 加载或初始化配置
+	//    注意：setupConfig 会把新系统也完成初始化，
+	//    所以之后 cfg.IsNewSystem() 会返回 false
 	cfg, err := setupConfig(layout)
 	if err != nil {
 		return fmt.Errorf("配置初始化失败: %w", err)
 	}
+	a.cfg = cfg
 
 	logger.Infof("配置文件: %s", cfg.GetConfigFile())
 	logger.Infof("数据库: %s", cfg.GetDatabasePath())
 
-	// 4. 初始化 Manager（下一步做）
-	// if err := setupManager(cfg); err != nil { return err }
+	// 4. 初始化 Manager
+	//    此时 cfg.IsNewSystem() 已经是 false，
+	//    所以 Initialize 内部会自动调用 postInit：
+	//    打开 SQLite、初始化 FFmpeg、创建 StreamManager 等
+	mgr, err := manager.Initialize(cfg, slogLogger)
+	if err != nil {
+		logger.Errorf("Manager 初始化失败: %v", err)
+		return fmt.Errorf("Manager 初始化失败: %w", err)
+	}
+	a.mgr = mgr
 
+	logger.Info("Manager 初始化完成")
+
+	return nil
+}
+
+// ServiceShutdown 应用关闭时调用
+func (a *App) ServiceShutdown() error {
+	logger.Info("Case 关闭")
+	if a.mgr != nil {
+		a.mgr.Shutdown()
+	}
 	return nil
 }
 
@@ -63,12 +105,6 @@ func (a *App) GetDataDir() (string, error) {
 	return layout.DataDir, nil
 }
 
-// ServiceShutdown 应用关闭时调用
-func (a *App) ServiceShutdown() error {
-	logger.Info("Case 关闭")
-	return nil
-}
-
 // GetVersion 返回版本号
 func (a *App) GetVersion() string {
 	return "0.1.0-dev"
@@ -77,4 +113,96 @@ func (a *App) GetVersion() string {
 // Ping 连通性测试
 func (a *App) Ping() string {
 	return "pong"
+}
+
+// GetSystemStatus 简单状态查询（验证 Manager 是否活着）
+func (a *App) GetSystemStatus() map[string]any {
+	if a.cfg == nil {
+		return map[string]any{"status": "config_not_ready"}
+	}
+
+	status := map[string]any{
+		"isNewSystem": a.cfg.IsNewSystem(),
+		"configFile":  a.cfg.GetConfigFile(),
+		"database":    a.cfg.GetDatabasePath(),
+	}
+
+	if a.mgr != nil {
+		status["manager"] = "ready"
+	} else {
+		status["manager"] = "not_initialized"
+	}
+
+	return status
+}
+
+// ScanLibrary 触发扫描指定文件夹。返回 Job ID，前端可通过事件监听进度。
+func (a *App) ScanLibrary(path string) (int, error) {
+	if a.mgr == nil {
+		return 0, fmt.Errorf("manager 未初始化")
+	}
+
+	input := manager.ScanMetadataInput{
+		Paths:  []string{path},
+		Rescan: false,
+	}
+
+	jobID, err := a.mgr.Scan(context.Background(), input)
+	if err != nil {
+		logger.Errorf("扫描失败: %v", err)
+		return 0, fmt.Errorf("扫描失败: %w", err)
+	}
+
+	logger.Infof("扫描任务已启动，Job ID: %d, 路径: %s", jobID, path)
+	return jobID, nil
+}
+
+// FindScenes 分页查询场景列表。
+func (a *App) FindScenes(page int, pageSize int) ([]SceneDTO, error) {
+	if a.mgr == nil {
+		return nil, fmt.Errorf("manager 未初始化")
+	}
+
+	var dtos []SceneDTO
+
+	err := a.mgr.Repository.WithReadTxn(context.Background(), func(ctx context.Context) error {
+		findFilter := &models.FindFilterType{
+			Page:    &page,
+			PerPage: &pageSize,
+		}
+
+		result, err := a.mgr.Repository.Scene.Query(ctx, models.SceneQueryOptions{
+			QueryOptions: models.QueryOptions{
+				FindFilter: findFilter,
+			},
+		})
+		if err != nil {
+			return err
+		}
+
+		scenes, err := result.Resolve(ctx)
+		if err != nil {
+			return err
+		}
+
+		for _, s := range scenes {
+			dtos = append(dtos, SceneDTO{
+				ID:        s.ID,
+				Title:     s.GetTitle(),
+				Path:      s.Path,
+				OSHash:    s.OSHash,
+				Checksum:  s.Checksum,
+				Organized: s.Organized,
+				CreatedAt: s.CreatedAt.Format("2006-01-02 15:04:05"),
+				UpdatedAt: s.UpdatedAt.Format("2006-01-02 15:04:05"),
+			})
+		}
+		return nil
+	})
+	if err != nil {
+		return nil, fmt.Errorf("查询场景失败: %w", err)
+	}
+
+	logger.Infof("查询场景: page=%d, pageSize=%d, 返回 %d 条", page, pageSize, len(dtos))
+	return dtos, nil
 }
