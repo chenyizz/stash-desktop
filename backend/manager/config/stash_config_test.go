@@ -5,119 +5,119 @@ import (
 	"testing"
 )
 
-func TestStashConfigsGetStashFromDirPathReturnsMostSpecificPath(t *testing.T) {
+func TestLibraryConfigsGetLibraryFromDirPathReturnsMostSpecificPath(t *testing.T) {
 	root := filepath.Join(t.TempDir(), "library")
 	nested := filepath.Join(root, "images")
 
-	parent := &StashConfig{
+	parent := &LibraryConfig{
 		Path:         root,
 		ExcludeImage: true,
 	}
-	child := &StashConfig{
+	child := &LibraryConfig{
 		Path:         nested,
 		ExcludeVideo: true,
 	}
 
-	stashes := StashConfigs{parent, child}
+	libs := LibraryConfigs{parent, child}
 
-	got := stashes.GetStashFromDirPath(filepath.Join(nested, "set"))
+	got := libs.GetLibraryFromDirPath(filepath.Join(nested, "set"))
 	if got != child {
-		t.Fatalf("expected nested stash config, got %#v", got)
+		t.Fatalf("expected nested library config, got %#v", got)
 	}
 }
 
-func TestStashConfigsGetStashFromDirPathReturnsMostSpecificPathRegardlessOfOrder(t *testing.T) {
+func TestLibraryConfigsGetLibraryFromDirPathReturnsMostSpecificPathRegardlessOfOrder(t *testing.T) {
 	root := filepath.Join(t.TempDir(), "library")
 	nested := filepath.Join(root, "images")
 
-	parent := &StashConfig{
+	parent := &LibraryConfig{
 		Path:         root,
 		ExcludeImage: true,
 	}
-	child := &StashConfig{
+	child := &LibraryConfig{
 		Path:         nested,
 		ExcludeVideo: true,
 	}
 
-	stashes := StashConfigs{child, parent}
+	libs := LibraryConfigs{child, parent}
 
-	got := stashes.GetStashFromDirPath(filepath.Join(nested, "set"))
+	got := libs.GetLibraryFromDirPath(filepath.Join(nested, "set"))
 	if got != child {
-		t.Fatalf("expected nested stash config, got %#v", got)
+		t.Fatalf("expected nested library config, got %#v", got)
 	}
 }
 
-func TestStashConfigsGetStashRootFromDirPathReturnsTopmostPath(t *testing.T) {
+func TestLibraryConfigsGetLibraryRootFromDirPathReturnsTopmostPath(t *testing.T) {
 	root := filepath.Join(t.TempDir(), "library")
 	nested := filepath.Join(root, "images")
 
-	stashes := StashConfigs{
+	libs := LibraryConfigs{
 		{Path: root},
 		{Path: nested},
 	}
 
-	got := stashes.GetStashRootFromDirPath(filepath.Join(nested, "set"))
+	got := libs.GetLibraryRootFromDirPath(filepath.Join(nested, "set"))
 	if got != root {
-		t.Fatalf("expected topmost stash path %q, got %q", root, got)
+		t.Fatalf("expected topmost library path %q, got %q", root, got)
 	}
 }
 
-func TestStashConfigsGetStashRootFromDirPathReturnsTopmostPathRegardlessOfOrder(t *testing.T) {
+func TestLibraryConfigsGetLibraryRootFromDirPathReturnsTopmostPathRegardlessOfOrder(t *testing.T) {
 	root := filepath.Join(t.TempDir(), "library")
 	nested := filepath.Join(root, "images")
 
-	stashes := StashConfigs{
+	libs := LibraryConfigs{
 		{Path: nested},
 		{Path: root},
 	}
 
-	got := stashes.GetStashRootFromDirPath(filepath.Join(nested, "set"))
+	got := libs.GetLibraryRootFromDirPath(filepath.Join(nested, "set"))
 	if got != root {
-		t.Fatalf("expected topmost stash path %q, got %q", root, got)
+		t.Fatalf("expected topmost library path %q, got %q", root, got)
 	}
 }
 
-func TestStashConfigsGetStashFromPathReturnsMostSpecificPath(t *testing.T) {
+func TestLibraryConfigsGetLibraryFromPathReturnsMostSpecificPath(t *testing.T) {
 	root := filepath.Join(t.TempDir(), "library")
 	nested := filepath.Join(root, "images")
 
-	parent := &StashConfig{
+	parent := &LibraryConfig{
 		Path:         root,
 		ExcludeImage: true,
 	}
-	child := &StashConfig{
+	child := &LibraryConfig{
 		Path:         nested,
 		ExcludeVideo: true,
 	}
 
-	stashes := StashConfigs{parent, child}
+	libs := LibraryConfigs{parent, child}
 
-	got := stashes.GetStashFromPath(filepath.Join(nested, "image.jpg"))
+	got := libs.GetLibraryFromPath(filepath.Join(nested, "image.jpg"))
 	if got != child {
-		t.Fatalf("expected nested stash config, got %#v", got)
+		t.Fatalf("expected nested library config, got %#v", got)
 	}
 }
 
-func TestStashConfigsGetStashFromDirPathReturnsNilOutsideLibraries(t *testing.T) {
+func TestLibraryConfigsGetLibraryFromDirPathReturnsNilOutsideLibraries(t *testing.T) {
 	root := filepath.Join(t.TempDir(), "library")
 	outside := filepath.Join(t.TempDir(), "outside")
 
-	stashes := StashConfigs{{Path: root}}
+	libs := LibraryConfigs{{Path: root}}
 
-	got := stashes.GetStashFromDirPath(outside)
+	got := libs.GetLibraryFromDirPath(outside)
 	if got != nil {
-		t.Fatalf("expected nil stash config, got %#v", got)
+		t.Fatalf("expected nil library config, got %#v", got)
 	}
 }
 
-func TestStashConfigsGetStashRootFromDirPathReturnsEmptyOutsideLibraries(t *testing.T) {
+func TestLibraryConfigsGetLibraryRootFromDirPathReturnsEmptyOutsideLibraries(t *testing.T) {
 	root := filepath.Join(t.TempDir(), "library")
 	outside := filepath.Join(t.TempDir(), "outside")
 
-	stashes := StashConfigs{{Path: root}}
+	libs := LibraryConfigs{{Path: root}}
 
-	got := stashes.GetStashRootFromDirPath(outside)
+	got := libs.GetLibraryRootFromDirPath(outside)
 	if got != "" {
-		t.Fatalf("expected empty stash path, got %q", got)
+		t.Fatalf("expected empty library path, got %q", got)
 	}
 }

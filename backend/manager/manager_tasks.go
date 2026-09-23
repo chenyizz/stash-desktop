@@ -19,17 +19,17 @@ import (
 )
 
 func useAsVideo(pathname string) bool {
-	stash := config.StashConfigs.GetStashFromDirPath(instance.Config.GetStashPaths(), pathname)
+	lib := config.LibraryConfigs.GetLibraryFromDirPath(instance.Config.GetLibraryPaths(), pathname)
 
-	if instance.Config.IsCreateImageClipsFromVideos() && stash != nil && stash.ExcludeVideo {
+	if instance.Config.IsCreateImageClipsFromVideos() && lib != nil && lib.ExcludeVideo {
 		return false
 	}
 	return isVideo(pathname)
 }
 
 func useAsImage(pathname string) bool {
-	stash := config.StashConfigs.GetStashFromDirPath(instance.Config.GetStashPaths(), pathname)
-	if instance.Config.IsCreateImageClipsFromVideos() && stash != nil && stash.ExcludeVideo {
+	lib := config.LibraryConfigs.GetLibraryFromDirPath(instance.Config.GetLibraryPaths(), pathname)
+	if instance.Config.IsCreateImageClipsFromVideos() && lib != nil && lib.ExcludeVideo {
 		return isImage(pathname) || isVideo(pathname)
 	}
 	return isImage(pathname)
@@ -50,16 +50,16 @@ func isImage(pathname string) bool {
 	return fsutil.MatchExtension(pathname, imgExt)
 }
 
-func getScanPaths(inputPaths []string) []*config.StashConfig {
-	stashPaths := config.GetInstance().GetStashPaths()
+func getScanPaths(inputPaths []string) []*config.LibraryConfig {
+	libPaths := config.GetInstance().GetLibraryPaths()
 
 	if len(inputPaths) == 0 {
-		return stashPaths
+		return libPaths
 	}
 
-	var ret config.StashConfigs
+	var ret config.LibraryConfigs
 	for _, p := range inputPaths {
-		s := stashPaths.GetStashFromDirPath(p)
+		s := libPaths.GetLibraryFromDirPath(p)
 		if s == nil {
 			logger.Warnf("%s is not in the configured case paths", p)
 			continue
@@ -74,17 +74,17 @@ func getScanPaths(inputPaths []string) []*config.StashConfig {
 	return ret
 }
 
-// Filters the input array for paths that are within the paths managed by stash
-func filterStashPaths(inputPaths []string) []string {
+// Filters the input array for paths that are within the paths managed by lib
+func filterLibraryPaths(inputPaths []string) []string {
 	if len(inputPaths) == 0 {
 		return inputPaths
 	}
 
-	stashPaths := config.GetInstance().GetStashPaths()
+	libPaths := config.GetInstance().GetLibraryPaths()
 
 	var ret []string
 	for _, p := range inputPaths {
-		s := stashPaths.GetStashFromDirPath(p)
+		s := libPaths.GetLibraryFromDirPath(p)
 		if s == nil {
 			logger.Warnf("%s is not in the configured case paths", p)
 			continue
@@ -147,7 +147,7 @@ func (s *Manager) Scan(ctx context.Context, input ScanMetadataInput) (int, error
 		// ScanFilters is set in ScanJob.Execute
 		// HandlerRequiredFilters is set in ScanJob.Execute
 		// #4425 - isRootPath compares these against the NFC paths stored during scanning
-		RootPaths: fsutil.NormalizePaths(cfg.GetStashPaths().Paths()),
+		RootPaths: fsutil.NormalizePaths(cfg.GetLibraryPaths().Paths()),
 		Rescan:    input.Rescan,
 	}
 

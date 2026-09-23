@@ -563,7 +563,7 @@ type scanFilter struct {
 	extensionConfig
 	txnManager txn.Manager
 
-	stashPaths        config.StashConfigs
+	libPaths          config.LibraryConfigs
 	generatedPath     string
 	videoExcludeRegex []*regexp.Regexp
 	imageExcludeRegex []*regexp.Regexp
@@ -575,7 +575,7 @@ func newScanFilter(c *config.Config, repo models.Repository, minModTime time.Tim
 	return &scanFilter{
 		extensionConfig:   newExtensionConfig(c),
 		txnManager:        repo.TxnManager,
-		stashPaths:        c.GetStashPaths(),
+		libPaths:          c.GetLibraryPaths(),
 		generatedPath:     c.GetGeneratedPath(),
 		videoExcludeRegex: generateRegexps(c.GetExcludes()),
 		imageExcludeRegex: generateRegexps(c.GetImageExcludes()),
@@ -595,14 +595,14 @@ func (f *scanFilter) Accept(ctx context.Context, path string, info fs.FileInfo, 
 		return false
 	}
 
-	s := f.stashPaths.GetStashFromDirPath(path)
+	s := f.libPaths.GetLibraryFromDirPath(path)
 	if s == nil {
 		logger.Debugf("Skipping %s as it is not in the case library", path)
 		return false
 	}
 
 	// Check .stashignore files, bounded to the library root.
-	if !f.stashIgnoreFilter.Accept(ctx, path, info, f.stashPaths.GetStashRootFromDirPath(path), zipFilePath) {
+	if !f.stashIgnoreFilter.Accept(ctx, path, info, f.libPaths.GetLibraryRootFromDirPath(path), zipFilePath) {
 		logger.Debugf("Skipping %s due to .stashignore", path)
 		return false
 	}

@@ -6,29 +6,29 @@ import (
 	"case/backend/pkg/fsutil"
 )
 
-// Stash configuration details
-type StashConfigInput struct {
+// Library configuration details
+type LibraryConfigInput struct {
 	Path         string `json:"path"`
 	ExcludeVideo bool   `json:"excludeVideo"`
 	ExcludeImage bool   `json:"excludeImage"`
 }
 
-type StashConfig struct {
+type LibraryConfig struct {
 	Path         string `json:"path"`
 	ExcludeVideo bool   `json:"excludeVideo"`
 	ExcludeImage bool   `json:"excludeImage"`
 }
 
-type StashConfigs []*StashConfig
+type LibraryConfigs []*LibraryConfig
 
-// GetStashFromPath returns the most specific stash configuration containing path.
-func (s StashConfigs) GetStashFromPath(path string) *StashConfig {
-	return s.GetStashFromDirPath(filepath.Dir(path))
+// GetLibraryFromPath returns the most specific library configuration containing path.
+func (s LibraryConfigs) GetLibraryFromPath(path string) *LibraryConfig {
+	return s.GetLibraryFromDirPath(filepath.Dir(path))
 }
 
-// GetStashFromDirPath returns the most specific stash configuration containing dirPath.
-func (s StashConfigs) GetStashFromDirPath(dirPath string) *StashConfig {
-	var ret *StashConfig
+// GetLibraryFromDirPath returns the most specific library configuration containing dirPath.
+func (s LibraryConfigs) GetLibraryFromDirPath(dirPath string) *LibraryConfig {
+	var ret *LibraryConfig
 	longestPath := -1
 
 	for _, f := range s {
@@ -46,8 +46,8 @@ func (s StashConfigs) GetStashFromDirPath(dirPath string) *StashConfig {
 	return ret
 }
 
-// GetStashRootFromDirPath returns the topmost configured stash path containing dirPath.
-func (s StashConfigs) GetStashRootFromDirPath(dirPath string) string {
+// GetLibraryRootFromDirPath returns the topmost configured library path containing dirPath.
+func (s LibraryConfigs) GetLibraryRootFromDirPath(dirPath string) string {
 	var ret string
 	shortestPath := -1
 
@@ -66,7 +66,7 @@ func (s StashConfigs) GetStashRootFromDirPath(dirPath string) string {
 	return ret
 }
 
-func (s StashConfigs) Paths() []string {
+func (s LibraryConfigs) Paths() []string {
 	paths := make([]string, len(s))
 	for i, c := range s {
 		// #6618 - clean the path to ensure comparison works correctly

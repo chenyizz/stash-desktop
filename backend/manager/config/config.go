@@ -716,14 +716,14 @@ func (i *Config) GetSFWContentMode() bool {
 	return i.getBool(SFWContentMode)
 }
 
-// GetStashPaths returns the configured stash library paths.
+// GetLibraryPaths returns the configured library paths.
 // Works opposite to the usual case - it will return the override
 // value only if the main value is not set.
-func (i *Config) GetStashPaths() StashConfigs {
+func (i *Config) GetLibraryPaths() LibraryConfigs {
 	i.RLock()
 	defer i.RUnlock()
 
-	var ret StashConfigs
+	var ret LibraryConfigs
 
 	v := i.main
 	if !v.Exists(Libraries) {
@@ -735,7 +735,7 @@ func (i *Config) GetStashPaths() StashConfigs {
 		ss := v.Strings(Libraries)
 		ret = nil
 		for _, path := range ss {
-			toAdd := &StashConfig{
+			toAdd := &LibraryConfig{
 				Path: path,
 			}
 			ret = append(ret, toAdd)

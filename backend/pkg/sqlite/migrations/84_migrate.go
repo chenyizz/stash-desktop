@@ -27,7 +27,7 @@ func pre84(ctx context.Context, db *sqlx.DB) error {
 		folderCache: make(map[string]folderInfo),
 	}
 
-	rootPaths := config.GetInstance().GetStashPaths().Paths()
+	rootPaths := config.GetInstance().GetLibraryPaths().Paths()
 
 	if err := m.createMissingFolderHierarchies(ctx, rootPaths); err != nil {
 		return fmt.Errorf("creating missing folder hierarchies: %w", err)

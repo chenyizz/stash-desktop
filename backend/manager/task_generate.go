@@ -193,7 +193,7 @@ func (j *GenerateJob) Execute(ctx context.Context, progress *job.Progress) error
 				}
 
 				if len(j.input.Paths) > 0 {
-					paths := filterStashPaths(j.input.Paths)
+					paths := filterLibraryPaths(j.input.Paths)
 					j.queueTasks(ctx, g, paths, queue)
 				}
 			}

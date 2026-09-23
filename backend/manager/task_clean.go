@@ -151,7 +151,7 @@ func newCleanFilter(c *config.Config) *cleanFilter {
 	return &cleanFilter{
 		scanFilter: scanFilter{
 			extensionConfig:   newExtensionConfig(c),
-			stashPaths:        c.GetStashPaths(),
+			libPaths:          c.GetLibraryPaths(),
 			generatedPath:     c.GetGeneratedPath(),
 			videoExcludeRegex: generateRegexps(c.GetExcludes()),
 			imageExcludeRegex: generateRegexps(c.GetImageExcludes()),
@@ -164,17 +164,17 @@ func (f *cleanFilter) Accept(ctx context.Context, path string, info fs.FileInfo,
 	//  #1102 - clean anything in generated path
 	generatedPath := f.generatedPath
 
-	var stash *config.StashConfig
+	var lib *config.LibraryConfig
 	fileOrFolder := "File"
 
 	if info.IsDir() {
 		fileOrFolder = "Folder"
-		stash = f.stashPaths.GetStashFromDirPath(path)
+		lib = f.libPaths.GetLibraryFromDirPath(path)
 	} else {
-		stash = f.stashPaths.GetStashFromPath(path)
+		lib = f.libPaths.GetLibraryFromPath(path)
 	}
 
-	if stash == nil {
+	if lib == nil {
 		logger.Infof("%s not in any case library directories. Marking to clean: %q", fileOrFolder, path)
 		return false
 	}
@@ -185,19 +185,19 @@ func (f *cleanFilter) Accept(ctx context.Context, path string, info fs.FileInfo,
 	}
 
 	// Check .stashignore files, bounded to the library root.
-	if !f.stashIgnoreFilter.Accept(ctx, path, info, f.stashPaths.GetStashRootFromDirPath(path), zipFilePath) {
+	if !f.stashIgnoreFilter.Accept(ctx, path, info, f.libPaths.GetLibraryRootFromDirPath(path), zipFilePath) {
 		logger.Infof("%s is excluded due to .stashignore. Marking to clean: %q", fileOrFolder, path)
 		return false
 	}
 
 	if info.IsDir() {
-		return !f.shouldCleanFolder(path, stash)
+		return !f.shouldCleanFolder(path, lib)
 	}
 
-	return !f.shouldCleanFile(path, info, stash)
+	return !f.shouldCleanFile(path, info, lib)
 }
 
-func (f *cleanFilter) shouldCleanFolder(path string, s *config.StashConfig) bool {
+func (f *cleanFilter) shouldCleanFolder(path string, s *config.LibraryConfig) bool {
 	// only delete folders where it is excluded from everything
 	pathExcludeTest := path + string(filepath.Separator)
 	if (s.ExcludeVideo || matchFileRegex(pathExcludeTest, f.videoExcludeRegex)) && (s.ExcludeImage || matchFileRegex(pathExcludeTest, f.imageExcludeRegex)) {
@@ -208,22 +208,22 @@ func (f *cleanFilter) shouldCleanFolder(path string, s *config.StashConfig) bool
 	return false
 }
 
-func (f *cleanFilter) shouldCleanFile(path string, info fs.FileInfo, stash *config.StashConfig) bool {
+func (f *cleanFilter) shouldCleanFile(path string, info fs.FileInfo, lib *config.LibraryConfig) bool {
 	switch {
 	case info.IsDir() || fsutil.MatchExtension(path, f.zipExt):
-		return f.shouldCleanGallery(path, stash)
+		return f.shouldCleanGallery(path, lib)
 	case useAsVideo(path):
-		return f.shouldCleanVideoFile(path, stash)
+		return f.shouldCleanVideoFile(path, lib)
 	case useAsImage(path):
-		return f.shouldCleanImage(path, stash)
+		return f.shouldCleanImage(path, lib)
 	default:
 		logger.Infof("File extension does not match any media extensions. Marking to clean: \"%s\"", path)
 		return true
 	}
 }
 
-func (f *cleanFilter) shouldCleanVideoFile(path string, stash *config.StashConfig) bool {
-	if stash.ExcludeVideo {
+func (f *cleanFilter) shouldCleanVideoFile(path string, lib *config.LibraryConfig) bool {
+	if lib.ExcludeVideo {
 		logger.Infof("File in case library that excludes video. Marking to clean: \"%s\"", path)
 		return true
 	}
@@ -236,8 +236,8 @@ func (f *cleanFilter) shouldCleanVideoFile(path string, stash *config.StashConfi
 	return false
 }
 
-func (f *cleanFilter) shouldCleanGallery(path string, stash *config.StashConfig) bool {
-	if stash.ExcludeImage {
+func (f *cleanFilter) shouldCleanGallery(path string, lib *config.LibraryConfig) bool {
+	if lib.ExcludeImage {
 		logger.Infof("File in case library that excludes images. Marking to clean: \"%s\"", path)
 		return true
 	}
@@ -250,8 +250,8 @@ func (f *cleanFilter) shouldCleanGallery(path string, stash *config.StashConfig)
 	return false
 }
 
-func (f *cleanFilter) shouldCleanImage(path string, stash *config.StashConfig) bool {
-	if stash.ExcludeImage {
+func (f *cleanFilter) shouldCleanImage(path string, lib *config.LibraryConfig) bool {
+	if lib.ExcludeImage {
 		logger.Infof("File in case library that excludes images. Marking to clean: \"%s\"", path)
 		return true
 	}
