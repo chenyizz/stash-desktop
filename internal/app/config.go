@@ -12,7 +12,8 @@ import (
 // setupConfig 加载或初始化配置。返回值 cfg 一定是可用的。
 func setupConfig(layout *Layout) (*config.Config, error) {
 	configFile := filepath.Join(layout.DataDir, "config.yml")
-	os.Setenv("STASH_CONFIG_FILE", configFile)
+	// 只写新名；旧名 STASH_CONFIG_FILE 仅作为兼容读的回退
+	os.Setenv("CASE_CONFIG_FILE", configFile)
 
 	cfg, err := config.Initialize()
 	if err != nil {

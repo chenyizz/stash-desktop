@@ -130,10 +130,17 @@ func (i *Config) loadFromCommandLine() {
 }
 
 func (i *Config) loadFromEnv() {
+	// 优先新前缀 CASE_，回退旧前缀 STASH_，兼容 v0.x。
+	// 先加载旧前缀，再加载新前缀；koanf 后加载会覆盖同名键，因此新名优先。
+	i.loadEnvPrefix("STASH_")
+	i.loadEnvPrefix("CASE_")
+}
+
+func (i *Config) loadEnvPrefix(prefix string) {
 	v := i.overrides
 
-	if err := v.Load(env.ProviderWithValue("STASH_", ".", func(key, value string) (string, interface{}) {
-		key = strings.ToLower(strings.TrimPrefix(key, "STASH_"))
+	if err := v.Load(env.ProviderWithValue(prefix, ".", func(key, value string) (string, interface{}) {
+		key = strings.ToLower(strings.TrimPrefix(key, prefix))
 		if newKey, ok := envBinds[key]; ok {
 			return newKey, value
 		}
@@ -151,7 +158,11 @@ func (i *Config) initOverrides() {
 
 func (i *Config) initConfig() error {
 	configFile := ""
-	envConfigFile := os.Getenv("STASH_CONFIG_FILE")
+	// 优先新名 CASE_CONFIG_FILE，回退旧名 STASH_CONFIG_FILE，兼容 v0.x
+	envConfigFile := os.Getenv("CASE_CONFIG_FILE")
+	if envConfigFile == "" {
+		envConfigFile = os.Getenv("STASH_CONFIG_FILE")
+	}
 
 	if flags.configFilePath != "" {
 		configFile = flags.configFilePath

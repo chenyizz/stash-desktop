@@ -563,7 +563,8 @@ func (i *Config) marshal() ([]byte, error) {
 // FileEnvSet returns true if the configuration file environment parameter
 // is set.
 func FileEnvSet() bool {
-	return os.Getenv("STASH_CONFIG_FILE") != ""
+	// 优先新名 CASE_CONFIG_FILE，回退旧名 STASH_CONFIG_FILE，兼容 v0.x
+	return os.Getenv("CASE_CONFIG_FILE") != "" || os.Getenv("STASH_CONFIG_FILE") != ""
 }
 
 // GetDataDir 返回应用数据根目录。
