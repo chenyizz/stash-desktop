@@ -50,4 +50,6 @@
 - **长期项：数据库表名/列名** `scene_stash_ids`、`tag_stash_ids`、`performer_stash_ids`、`studio_stash_ids`、`group_stash_ids` 及列 `stash_id` / `endpoint`。暂不改（迁移风险），随 `StashID` 评估项一并处理。
 - `StashBox` / `StashBoxInput` / `GetStashBoxes` 保留（stash-box 协议专有名词）。
 - **环境变量保留旧名**：`STASH_HW_TEST_TIMEOUT`、`STASH_HW_DRI_DEVICE`（`backend/pkg/ffmpeg`）、`STASH_SQLITE_CACHE_SIZE`（`backend/pkg/sqlite`）仍是旧名，位于冻结区，单独做太碎——与 Step 5 第三级标识符清理一起处理（届时加 `CASE_` 回退）。
+- **兼容旧名代码（过渡期）**：`STASH_CONFIG_FILE`、`STASH_` 前缀、`~/.stash`、`stash-go.sqlite`、配置键 `stash` 的兼容读取逻辑，属于过渡期代码，待用户升级完成后删除。偿还时机：v1.0 发布后一个版本周期。
+- **默认数据库名 `stash-go.sqlite` → `case.db`**：若存在存量 `stash-go.sqlite`，当前会被忽略（不会自动迁移）。如需兼容，首次启动时检测旧文件并提示用户。偿还时机：有真实用户存量时。
 - 命名清理分批计划：第一级用户可见字符串（立改）；第二级配置键/环境变量（兼容旧名）；第三级标识符（按包，`StashConfig→LibraryConfig` 与扫描模式 D1 同批、`stashignore→caseignore` 兼容旧文件）；第四级数据库表名（不改，见上）；第五级 blob 路径（无残留，不动）。

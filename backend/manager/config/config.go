@@ -34,6 +34,8 @@ import (
 )
 
 const (
+	Libraries = "libraries"
+	// Stash is the legacy key for library paths, kept for v0.x compatibility.
 	Stash               = "stash"
 	Cache               = "cache"
 	BackupDirectoryPath = "backup_directory_path"
@@ -724,16 +726,24 @@ func (i *Config) GetStashPaths() StashConfigs {
 	i.RLock()
 	defer i.RUnlock()
 
-	var ret StashConfigs
-
+	// pick the source: main wins if it has either key, otherwise overrides
+	// (legacy behaviour for library paths)
 	v := i.main
-	if !v.Exists(Stash) {
+	if !i.main.Exists(Libraries) && !i.main.Exists(Stash) {
 		v = i.overrides
 	}
 
-	if err := v.Unmarshal(Stash, &ret); err != nil || len(ret) == 0 {
+	// 优先读新键 libraries，回退旧键 stash，兼容 v0.x
+	key := Libraries
+	if !v.Exists(Libraries) && v.Exists(Stash) {
+		key = Stash
+	}
+
+	var ret StashConfigs
+
+	if err := v.Unmarshal(key, &ret); err != nil || len(ret) == 0 {
 		// fallback to legacy format
-		ss := v.Strings(Stash)
+		ss := v.Strings(key)
 		ret = nil
 		for _, path := range ss {
 			toAdd := &StashConfig{

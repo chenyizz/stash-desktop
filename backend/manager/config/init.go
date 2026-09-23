@@ -42,8 +42,10 @@ var (
 		"metadata":      Metadata,
 		"blobs":         BlobsPath,
 		"cache":         Cache,
-		"stash":         Stash,
-		"ui":            UILocation,
+		// "stash" is the legacy env name; both map to the new Libraries key
+		"stash":     Libraries,
+		"libraries": Libraries,
+		"ui":        UILocation,
 	}
 )
 
