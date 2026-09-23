@@ -41,7 +41,6 @@ func TestInitConfig_ExplicitConfigFileWins(t *testing.T) {
 	require.NoError(t, os.WriteFile(configFile, []byte("generated: /tmp/gen\n"), 0o644))
 
 	t.Setenv("CASE_CONFIG_FILE", configFile)
-	t.Setenv("STASH_CONFIG_FILE", "")
 
 	cfg := InitializeEmpty()
 	require.NoError(t, cfg.initConfig())
@@ -49,22 +48,4 @@ func TestInitConfig_ExplicitConfigFileWins(t *testing.T) {
 	assert.False(t, cfg.IsNewSystem())
 	assert.Equal(t, configFile, cfg.GetConfigFile())
 	assert.Equal(t, "/tmp/gen", cfg.getString(Generated))
-}
-
-func TestInitConfig_LegacyEnvConfigFileStillLoads(t *testing.T) {
-	flags.configFilePath = ""
-
-	dir := t.TempDir()
-	configFile := filepath.Join(dir, "legacy.yml")
-	require.NoError(t, os.WriteFile(configFile, []byte("generated: /tmp/legacy\n"), 0o644))
-
-	t.Setenv("CASE_CONFIG_FILE", "")
-	t.Setenv("STASH_CONFIG_FILE", configFile)
-
-	cfg := InitializeEmpty()
-	require.NoError(t, cfg.initConfig())
-
-	assert.False(t, cfg.IsNewSystem())
-	assert.Equal(t, configFile, cfg.GetConfigFile())
-	assert.Equal(t, "/tmp/legacy", cfg.getString(Generated))
 }

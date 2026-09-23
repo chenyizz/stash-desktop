@@ -272,7 +272,6 @@ func (s *Manager) Setup(ctx context.Context, input SetupInput) error {
 		cfg.SetString(config.Database, input.DatabaseFile)
 	}
 
-	// 只写新键 libraries；旧键 stash 仅用于读取兼容
 	cfg.SetInterface(config.Libraries, input.Stashes)
 
 	if input.InitialUsername != "" && input.InitialPassword != "" {

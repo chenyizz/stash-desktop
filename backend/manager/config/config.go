@@ -34,9 +34,7 @@ import (
 )
 
 const (
-	Libraries = "libraries"
-	// Stash is the legacy key for library paths, kept for v0.x compatibility.
-	Stash               = "stash"
+	Libraries           = "libraries"
 	Cache               = "cache"
 	BackupDirectoryPath = "backup_directory_path"
 	Generated           = "generated"
@@ -565,8 +563,7 @@ func (i *Config) marshal() ([]byte, error) {
 // FileEnvSet returns true if the configuration file environment parameter
 // is set.
 func FileEnvSet() bool {
-	// 优先新名 CASE_CONFIG_FILE，回退旧名 STASH_CONFIG_FILE，兼容 v0.x
-	return os.Getenv("CASE_CONFIG_FILE") != "" || os.Getenv("STASH_CONFIG_FILE") != ""
+	return os.Getenv("CASE_CONFIG_FILE") != ""
 }
 
 // GetDataDir 返回应用数据根目录。
@@ -726,24 +723,16 @@ func (i *Config) GetStashPaths() StashConfigs {
 	i.RLock()
 	defer i.RUnlock()
 
-	// pick the source: main wins if it has either key, otherwise overrides
-	// (legacy behaviour for library paths)
+	var ret StashConfigs
+
 	v := i.main
-	if !i.main.Exists(Libraries) && !i.main.Exists(Stash) {
+	if !v.Exists(Libraries) {
 		v = i.overrides
 	}
 
-	// 优先读新键 libraries，回退旧键 stash，兼容 v0.x
-	key := Libraries
-	if !v.Exists(Libraries) && v.Exists(Stash) {
-		key = Stash
-	}
-
-	var ret StashConfigs
-
-	if err := v.Unmarshal(key, &ret); err != nil || len(ret) == 0 {
-		// fallback to legacy format
-		ss := v.Strings(key)
+	if err := v.Unmarshal(Libraries, &ret); err != nil || len(ret) == 0 {
+		// fallback to legacy format: a plain list of paths
+		ss := v.Strings(Libraries)
 		ret = nil
 		for _, path := range ss {
 			toAdd := &StashConfig{
