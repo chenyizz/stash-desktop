@@ -65,7 +65,7 @@
 
 ## 静态检查（go vet）
 
-`go vet ./backend/manager/...` 有 5 条既有告警（均在冻结区 `backend/manager`），暂不修，待 Step 5b 完成后单独评估：
+`go vet ./backend/manager/...` 有 5 条既有告警（均在冻结区 `backend/manager`），暂不修，待单独评估：
 
 - `generator_interactive_heatmap_speed.go:132`：`%d` 用于 `float64`（应 `%f`）
 - `task_generate.go:245`：`logger.Infof(logMsg)` 非常量格式串（应 `logger.Infof("%s", logMsg)`）

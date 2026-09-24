@@ -118,7 +118,7 @@ func DateFromYear(year int) Date
 | ------------------------------- | ----------------------------------------- |
 | `ffmpeg.go` / `ffprobe.go` / `codec*.go` | FFmpeg/FFProbe 封装、硬件加速检测（NVENC 等） |
 | `stream*.go` / `types.go`       | 转码、流式传输、公共类型与参数            |
-| `config.go` / `enums.go` / `stash_config.go` / `tasks.go` / `ui.go` | 配置读写校验、枚举、库路径/任务/UI |
+| `config.go` / `enums.go` / `library_config.go` / `tasks.go` / `ui.go` | 配置读写校验、枚举、库路径/任务/UI |
 
 **注意**：`backend/manager/config` 属冻结区。
 
@@ -192,9 +192,9 @@ git diff --name-only HEAD -- backend/manager backend/pkg  # 找冻结区改动
 
 | 日期       | 变更                                                         |
 | ---------- | ------------------------------------------------------------ |
+| 2026-09-23 | 命名清理（阶段 5）：`StashConfig→LibraryConfig`、`stash_config.go→library_config.go`、`stashignore.go→caseignore.go`、`GetStashHomeDirectory→GetCaseHomeDirectory`、`STASH_*`→`CASE_*` |
 | 2026-09-23 | 阶段 2.4.5：`metadata/cover/` 策略链 + `internal/app/cover.go`（按需封面 `/covers/<id>`） |
 | 2026-09-23 | 阶段 2.4.4：详情页 + hash 路由（`frontend/src/lib/`），ADR-006/007 |
 | 2026-09-23 | 阶段 2.4.3：`internal/app/scene.go` 新增 `GetScene` / `SceneDetailDTO` |
 | 2026-09-23 | 阶段 2.4.2：新增 `nfo/applier.go` 并在 `scene.ScanHandler` post-commit 接入 |
-| 2026-09-23 | 复核实际文件：修正 models 类型摘要、internal/app 与 frontend 清单，补 `ffmpeg` / `manager/config` / `scene` 模块，合并 utils/fsutil |
-| 2026-09-23 | 创建，加入 `metadata/nfo/` 模块                              |
+| 2026-09-23 | 复核实际文件并创建：修正 models 类型摘要，补 `ffmpeg`/`manager/config`/`scene`/`metadata` 模块 |
