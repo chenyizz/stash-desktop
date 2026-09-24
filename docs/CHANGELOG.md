@@ -1,5 +1,16 @@
 # CHANGELOG
 
+## 2026-09-24（阶段 3.5 - 前端重构：泛化路由 + 导航）
+
+### 修改
+
+- `frontend/src/lib/router.svelte.ts`：前缀路由解析（`/`、`/scenes/:id`、`/performers`、`/tags`、`/studios`）；导出 `NAV_ITEMS` 与 `isActive`
+- `frontend/src/App.svelte`：顶部导航（由 `NAV_ITEMS` 渲染）、按 `route.name` 分发；未实现页暂以「开发中」占位
+
+### 验证
+
+- `npm run check`：0 errors；`npm run build`：通过；`wails3 dev` 冒烟成功
+
 ## 2026-09-24（阶段 3.4 - 前端重构：抽出 Pager）
 
 ### 修改
