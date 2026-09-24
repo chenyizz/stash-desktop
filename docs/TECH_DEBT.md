@@ -11,6 +11,7 @@
 
 | 项 | 偿还时机 |
 |---|---|
+| `internal/app` 结构迁移（`dto/`/`service/`/`middleware/`/`infra/`）未执行，当前平铺 | 阶段 3 |
 | `context.TODO()` 19 处（冻结区 `manager`/`ffmpeg`） | 阶段 5 |
 | `signedurl` 函数级零引用（仅常量被 `ffmpeg` 用） | 阶段 3 抽查流媒体功能 |
 | `group` / `savedfilter` UI 未暴露 | 阶段 3 决定是否进核心业务 |
