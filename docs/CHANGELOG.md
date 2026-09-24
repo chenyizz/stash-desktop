@@ -1,5 +1,32 @@
 # CHANGELOG
 
+## 2026-09-24（阶段 3.1 - 扫描完成事件）
+
+### 新增
+
+- `internal/app/events.go`：`watchScanEvents` + 事件契约 `scan:complete`（payload `{at:int64}`，冻结不加 started/failed/jobType）
+- `internal/app/events_test.go`：watcher 3 用例（触发 / ctx 取消 / 通道关闭）
+- `frontend/src/lib/events.ts`：事件名常量
+
+### 修改
+
+- `internal/app/app.go`：`ServiceStartup` 启动 watcher；`ServiceShutdown` 取消
+- `frontend/src/lib/components/SceneList.svelte`：改用 `Events.On(SCAN_COMPLETE)` 刷新，删除 `setTimeout(loadScenes, 2000)`
+
+### 修复
+
+- 无
+
+### 验证
+
+- `go build ./...`、`go test ./internal/app/...`：通过
+- `npm run check`：0 errors；`npm run build`：通过
+- `wails3 dev`：构建成功、WebView2 启动成功
+
+### 说明
+
+- 取消扫描时后端不发事件，前端用「刷新」按钮兜底（已记 `PROJECT_STATE.md` 已知问题）
+
 ## 2026-09-23（阶段 2 收尾）
 
 ### 修改

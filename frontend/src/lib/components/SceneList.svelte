@@ -1,7 +1,9 @@
 <script lang="ts">
-  import { onMount } from "svelte";
+  import { onDestroy, onMount } from "svelte";
+  import { Events } from "@wailsio/runtime";
   import { App } from "../../../bindings/case/internal/app";
   import { navigate } from "../router.svelte";
+  import { SCAN_COMPLETE } from "../events";
 
   let scanPath = $state("");
   let scanResult = $state("");
@@ -21,8 +23,6 @@
     try {
       const jobID = await App.ScanLibrary(scanPath.trim());
       scanResult = `✅ 扫描任务已启动，Job ID: ${jobID}`;
-      // 扫描是异步的，等 2 秒后刷新列表
-      setTimeout(loadScenes, 2000);
     } catch (e) {
       scanResult = `❌ 扫描失败: ${e}`;
     } finally {
@@ -46,9 +46,19 @@
     navigate(`/scenes/${id}`);
   }
 
+  let offScan: (() => void) | undefined;
+
   onMount(() => {
     loadScenes();
+    // 后端扫描/清理完成事件（替代 setTimeout 轮询）
+    offScan = Events.On(SCAN_COMPLETE, () => {
+      scanning = false;
+      scanResult = "✅ 扫描完成，已刷新列表";
+      loadScenes();
+    });
   });
+
+  onDestroy(() => offScan?.());
 </script>
 
 <main>

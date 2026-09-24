@@ -151,8 +151,8 @@ func DateFromYear(year int) Date
 | `app.go`           | Wails `ServiceStartup`、`ScanLibrary` / `FindScenes`、`SceneDTO` 定义 |
 | `scene.go`         | `GetScene` / `SceneDetailDTO` / `TagDTO` / `PerformerDTO` / `SceneFileDTO` |
 | `cover.go`         | `ensureCover`（按需生成）+ `CoverMiddleware`（`/covers/<id>`） |
-| `config.go`        | 配置初始化（`setupConfig`）                                  |
-| `logging.go`       | 日志初始化与 UI Handler                                      |
+| `events.go`        | `watchScanEvents`（扫描完成推送 `scan:complete`）             |
+| `config.go` / `logging.go` | 配置初始化、日志初始化与 UI Handler                  |
 | `paths.go` / `wails_emitter.go` | 数据目录布局、事件/日志推送适配             |
 
 **规则**：只做胶水，不写业务逻辑。导出方法首字母大写才会暴露给前端。
@@ -162,7 +162,7 @@ func DateFromYear(year int) Date
 | 路径                      | 职责                                              |
 | ------------------------- | ------------------------------------------------- |
 | `App.svelte` / `main.ts`  | 路由 shell（列表 ↔ 详情）与入口挂载              |
-| `lib/`                    | `router.svelte.ts`（hash 路由）、`components/`（SceneList/SceneDetail）、`format.ts`、`external.ts` |
+| `lib/`                    | `router.svelte.ts`（hash 路由）、`components/`（SceneList/SceneDetail）、`format.ts`、`external.ts`、`events.ts` |
 
 ---
 
@@ -192,9 +192,8 @@ git diff --name-only HEAD -- backend/manager backend/pkg  # 找冻结区改动
 
 | 日期       | 变更                                                         |
 | ---------- | ------------------------------------------------------------ |
+| 2026-09-24 | 阶段 3.1：`internal/app/events.go`（`scan:complete` 事件）+ `frontend/src/lib/events.ts` |
 | 2026-09-23 | 命名清理（阶段 5）：`StashConfig→LibraryConfig`、`stash_config.go→library_config.go`、`stashignore.go→caseignore.go`、`GetStashHomeDirectory→GetCaseHomeDirectory`、`STASH_*`→`CASE_*` |
-| 2026-09-23 | 阶段 2.4.5：`metadata/cover/` 策略链 + `internal/app/cover.go`（按需封面 `/covers/<id>`） |
-| 2026-09-23 | 阶段 2.4.4：详情页 + hash 路由（`frontend/src/lib/`），ADR-006/007 |
-| 2026-09-23 | 阶段 2.4.3：`internal/app/scene.go` 新增 `GetScene` / `SceneDetailDTO` |
-| 2026-09-23 | 阶段 2.4.2：新增 `nfo/applier.go` 并在 `scene.ScanHandler` post-commit 接入 |
+| 2026-09-23 | 阶段 2.4.4/2.4.5：详情页 + hash 路由；`metadata/cover/` 策略链 + `internal/app/cover.go` |
+| 2026-09-23 | 阶段 2.4.2/2.4.3：`nfo/applier.go` post-commit 接入；`GetScene` / `SceneDetailDTO` |
 | 2026-09-23 | 复核实际文件并创建：修正 models 类型摘要，补 `ffmpeg`/`manager/config`/`scene`/`metadata` 模块 |

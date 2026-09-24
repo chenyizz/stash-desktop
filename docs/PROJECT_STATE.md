@@ -22,6 +22,7 @@
 - `GetScene(id)` 返回完整 `SceneDetailDTO`（元数据 + 结构化 tags/performers + files）
 - 详情页 Svelte 组件 + 自研 hash 路由（列表 ↔ 详情）
 - 封面图：`backend/pkg/metadata/cover/` 策略链（poster → 同名图 → FFmpeg 20%）+ `/covers/<id>` 中间件 + 详情页展示/占位
+- 扫描完成事件：后端 `scan:complete`（`internal/app/events.go`）+ 前端监听，替代 `setTimeout`
 
 ## 当前焦点
 
@@ -29,23 +30,23 @@
 
 ## 下一步
 
-1. 扫描完成事件，替代 `setTimeout`
-2. 列表分页 / 标签 / 演员展示
-3. 封面缩略图与列表海报墙
-4. 阶段 3 结束前写 `docs/MIGRATIONS.md`（记录当前 schema、每张表作用、停用表、删除顺序）
+1. 列表分页 / 标签 / 演员展示
+2. 封面缩略图与列表海报墙
+3. 阶段 3 结束前写 `docs/MIGRATIONS.md`（记录当前 schema、每张表作用、停用表、删除顺序）
 
 ## 已知问题（阶段 3 相关）
 
-- 扫描完成用 `setTimeout` 等，不可靠 → 阶段 3 改事件通知
 - 无分页
 - 无虚拟滚动
 - 列表看不到标签/演员
 - 同场景多文件首次扫描时标量字段由并行顺序决定（阶段 3+ 再设计优先级）
+- 取消扫描时后端不发 `scan:complete`，前端需手动刷新（用刷新按钮兜底）
 
 > 其余技术债（封面同步/缩略图/缓存/NFO 编码/测试缺口/工程化等）统一见 `docs/TECH_DEBT.md`，此处不再重复。
 
 ## 最近变更
 
+- 扫描完成事件：`internal/app/events.go`（watcher + 契约 `scan:complete` + `{at}`）替代前端 `setTimeout`
 - 封面收尾：`CoverURL` 缓存参数改用 `md5(bytes)[:8]`（`UpdateCover` 不改 `updated_at`）；解码失败置空走占位
 - 新增封面：blob 存储 + 策略链解析 + `/covers/<id>` 中间件 + 详情页封面/占位 + DTO 三个封面字段
 - 新增详情页 + hash 路由（`frontend/src/lib/`）：SceneList/SceneDetail、router、format、external

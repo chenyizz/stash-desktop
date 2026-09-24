@@ -18,6 +18,8 @@ type App struct {
 	cfg    *config.Config
 	mgr    *manager.Manager
 	logger *slog.Logger
+
+	cancel context.CancelFunc
 }
 
 type SceneDTO struct {
@@ -84,12 +86,20 @@ func (a *App) ServiceStartup(ctx context.Context, options application.ServiceOpt
 
 	logger.Info("Manager 初始化完成")
 
+	// 订阅扫描完成信号并推送到前端（事件契约：scan:complete + {at}）
+	watchCtx, cancel := context.WithCancel(context.Background())
+	a.cancel = cancel
+	go watchScanEvents(watchCtx, mgr, (&wailsEmitter{app: a.app}).Emit)
+
 	return nil
 }
 
 // ServiceShutdown 应用关闭时调用
 func (a *App) ServiceShutdown() error {
 	logger.Info("Case 关闭")
+	if a.cancel != nil {
+		a.cancel()
+	}
 	if a.mgr != nil {
 		a.mgr.Shutdown()
 	}
