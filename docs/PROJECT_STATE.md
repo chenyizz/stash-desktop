@@ -35,16 +35,23 @@
 
 ## 当前焦点
 
-**阶段 3：核心业务（演员/标签/工作室/搜索/分页）**
+**阶段 3 收尾（虚拟滚动 / 标签·工作室详情 / MIGRATIONS）+ 写路径规划（阶段 4-7）**
 
 ## 下一步
 
-1. 虚拟滚动
-2. 阶段 3 结束前写 `docs/MIGRATIONS.md`（记录当前 schema、每张表作用、停用表、删除顺序）
+1. 虚拟滚动（`@tanstack/svelte-virtual`，`PAGE_SIZE=300`，先 SceneList）
+2. 标签详情页 / 工作室详情页（与演员详情同模式）
+3. `docs/MIGRATIONS.md`（阶段 3 收尾）
+4. 阶段 4 设计（配置写 / Settings）
 
 ## 已知问题（阶段 3 相关）
 
 - 无虚拟滚动
+- 标签/工作室详情页未做
+- **无设置页**：库路径/`LibraryMode`/扫描项/附件目录只能手改 `config.yml`；首次使用库路径为空，非技术用户被阻塞（阶段 4）
+- **无内容编辑**：演员/标签/工作室/场景/封面/头像只能读，不能写（阶段 5）
+- **无 NFO 回写**：NFO 只能导入，不能导出（阶段 6）
+- 无任务队列 UI（进度/取消）与备份/维护入口（阶段 7）
 - 同场景多文件首次扫描时标量字段由并行顺序决定（阶段 3+ 再设计优先级）
 - 取消扫描时后端不发 `scan:complete`，前端需手动刷新（用刷新按钮兜底）
 
@@ -52,8 +59,9 @@
 
 ## 最近变更
 
+- 阶段计划重排：新增「4 配置写 / 5 内容写 / 6 NFO 回写 / 7 任务维护」，插件→8、性能→9、打包→10、重构→11
+- 新增 ADR-010（编辑数据流与 NFO 回写）、ADR-011（配置持久化与热生效）、ADR-012（写路径统一模式）
 - 演员详情页：`GetPerformer` + 详情 DTO（剔除敏感字段）+ 头像端点 + `#/performers/:id`；列表卡片可点击
-- 过滤：`internal/app/filter.go` + `FilterBar`/`EntityPicker`（已整理/评分/日期/tag/演员/工作室，显式应用）
 - 列表分页 + 标签/演员：`FindScenes` 返回 `ScenesPageDTO`；`SceneDTO` 含 `tags`/`performers`（本页批量取名称）
 - 扫描完成事件：`internal/app/events.go`（watcher + 契约 `scan:complete` + `{at}`）替代前端 `setTimeout`
 - 封面收尾：`CoverURL` 缓存参数改用 `md5(bytes)[:8]`（`UpdateCover` 不改 `updated_at`）；解码失败置空走占位

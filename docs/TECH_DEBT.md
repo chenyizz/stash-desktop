@@ -11,18 +11,45 @@
 
 | 项 | 偿还时机 |
 |---|---|
-| `internal/app` 结构迁移（`dto/`/`service/`/`middleware/`/`infra/`）未执行，当前平铺 | 阶段 3 |
-| `context.TODO()` 19 处（冻结区 `manager`/`ffmpeg`） | 阶段 5 |
+| `internal/app` 结构迁移（`dto/`/`service/`/`middleware/`/`infra/`）未执行，当前平铺 | 阶段 3 收尾或阶段 5 前 |
+| `context.TODO()` 19 处（冻结区 `manager`/`ffmpeg`） | 阶段 9 |
 | `signedurl` 函数级零引用（仅常量被 `ffmpeg` 用） | 阶段 3 抽查流媒体功能 |
 | `group` / `savedfilter` UI 未暴露 | 阶段 3 决定是否进核心业务 |
-| `scraper` / `match` 待评估（AGENTS：暂留不再使用） | 阶段 4 插件桥设计时 |
-| `plugin/util` 零引用（仅 build-tag 示例依赖） | 阶段 4 |
-| `session` 桌面端残留（`Get/SetCurrentUserID` 等） | 阶段 7 |
-| 数据库停用表（`saved_filters`、`groups*`、`scene_markers*`、`galleries_chapters`、`video_captions`） | 阶段 7（删表需新迁移） |
-| TODO 注释 132 处 / `deprecated` 标记 58 处 | 阶段 7 |
-| 小写 `stash` 106 处（多为注释/测试夹具） | 阶段 7 |
+| `scraper` / `match` 待评估（AGENTS：暂留不再使用） | 阶段 8 插件桥设计时 |
+| `plugin/util` 零引用（仅 build-tag 示例依赖） | 阶段 8 |
+| `session` 桌面端残留（`Get/SetCurrentUserID` 等） | 阶段 11 |
+| 数据库停用表（`saved_filters`、`groups*`、`scene_markers*`、`galleries_chapters`、`video_captions`） | 阶段 11（删表需新迁移） |
+| TODO 注释 132 处 / `deprecated` 标记 58 处 | 阶段 11 |
+| 小写 `stash` 106 处（多为注释/测试夹具） | 阶段 11 |
 
 相关决策见 `docs/ARCHITECTURE.md` ADR-009。
+
+## 写路径缺口（阶段 4-7）
+
+> 阶段计划重排后新增：此前 Roadmap 只覆盖「读」，以下为「写」的完整缺口（不展开实现，见对应阶段）。
+
+**阶段 4 配置写（Settings）**
+- 无设置页；库路径/`LibraryMode`/扫描项/附件目录只能手改 `config.yml`。
+- 首次使用库路径为空，无引导；非技术用户被阻塞。
+- 配置改动无热生效矩阵（哪些热生效/需重扫/需重启未定义，见 ADR-011）。
+- `attachments.DefaultDirs` 为硬编码常量，未接配置。
+
+**阶段 5 内容写**
+- 演员：无 CRUD/别名管理/合并（含别名）/头像上传；后端 `Create/UpdatePartial/UpdateImage/Merge` 已存在。
+- 标签：无 CRUD/别名/父子/合并；后端已存在含 `Merge`。
+- 工作室：无 CRUD；**无 `Merge`**（后端缺，暂不补，等真实需求）。
+- 场景：无元数据编辑/封面替换/删除/合并；后端 `UpdatePartial/UpdateCover/Destroy/Merge` 已存在。
+- 无重复检测入口（hash/phash/标题）。
+
+**阶段 6 NFO 回写**
+- 无 NFO writer/序列化；NFO 只读。策略见 ADR-010（DB 唯一源、显式导出、冲突提示、未知标签不覆盖）。
+
+**阶段 7 任务与维护**
+- 无任务队列 UI（进度/取消）；后端 `job.GetQueue/CancelJob/CancelAll/Subscribe` 已存在。
+- 无备份/恢复/DB 优化/清缓存入口；后端 `backup.go`/`OptimiseDatabase`/`AnonymiseDatabase` 已存在。
+
+**通用写路径基础设施（ADR-012）**
+- 缺统一的「表单 + 校验 + 保存态 + 错误映射」前端层与 `internal/app` 写服务层；`Studio.Merge` 缺失已知。
 
 ## 功能性缺口
 

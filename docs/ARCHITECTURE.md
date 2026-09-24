@@ -48,7 +48,7 @@
 
 ## ADR-005：Scraper 与插件分离
 
-决策：当前阶段不做 Scraper。阶段 4 先做插件桥，阶段 4+ 再把 Scraper 设计成插件的一种类型。
+决策：当前阶段不做 Scraper。阶段 8 先做插件桥，之后再把 Scraper 设计成插件的一种类型。
 
 理由：
 
@@ -132,14 +132,14 @@ type LibraryMode struct {
 
 ## ADR-009：StashID 与停用概念的偿还时机
 
-决策：`StashID/StashIDs/stash_id`、Group、SavedFilter、SceneMarker，以及 `scraper`/`match` 子系统，**当前保留现有代码和数据库表**，不在命名清理步骤（阶段 5）中处理。
+决策：`StashID/StashIDs/stash_id`、Group、SavedFilter、SceneMarker，以及 `scraper`/`match` 子系统，**当前保留现有代码和数据库表**，不在命名清理步骤中处理。
 
 偿还时机：
 
 - 阶段 3：`group` / `savedfilter` 决定是否进核心业务；`signedurl` 抽查流媒体功能。
-- 阶段 4：`scraper` / `match` 随插件桥设计评估；`plugin/util` 随示例决定。
-- 阶段 5：`context.TODO()` 19 处收敛。
-- 阶段 7：`session` 桌面端残留、数据库停用表（需新迁移）、TODO 132 / deprecated 58、小写 `stash` 注释与夹具。
+- 阶段 8（插件）：`scraper` / `match` 随插件桥设计评估；`plugin/util` 随示例决定。
+- 阶段 9（性能）：`context.TODO()` 19 处收敛。
+- 阶段 11（重构）：`session` 桌面端残留、数据库停用表（需新迁移）、TODO 132 / deprecated 58、小写 `stash` 注释与夹具。
 
 理由：
 
@@ -148,3 +148,60 @@ type LibraryMode struct {
 - 明确偿还时机，不是"忘了改"。
 
 完整清单：`docs/TECH_DEBT.md`「偿还时机清单」与 `docs/HEALTH_SCAN.md`。
+
+## ADR-010：编辑数据流与 NFO 回写
+
+决策：
+
+- **DB 是唯一事实源**。前端编辑 → `internal/app` 写方法 → DB。
+- **NFO 默认不回写**（保持为导入源）；提供**显式「导出 NFO」**动作（单场景 / 批量），不做自动回写。
+- 导入侧保持 **fill-only**（只填不覆盖），因此 DB 编辑不会被重扫冲掉。
+- 导出前检查 NFO 是否被外部修改（mtime 或内容 hash）；若被改过，**提示用户选择**（覆盖 / 跳过 / 另存）。
+- NFO 含未知标签时，导出**默认不覆盖**（跳过或另存），避免丢数据。
+
+**显式后果（重要取舍）**：改了 DB 但不执行导出，**NFO 文件不会跟着变**。反向亦然——外部直接改 NFO 不会自动进 DB，需重新扫描（且 fill-only 不会覆盖已有值）。
+
+理由：
+
+- 双源写入必然冲突；把 NFO 降级为「导入 + 显式导出」可避免隐式覆盖。
+- fill-only 已在 2.4.2 实现，行为一致。
+
+重评时机：
+
+- 需要 NFO 与 DB 自动同步，或 NFO 作为多端共享源时。
+
+## ADR-011：配置持久化与热生效
+
+决策：`config.yml` 是配置源（不是 DB）；Settings 页经 `backend/manager/config` 的 setter 写入并 `Write()` 持久化。
+
+**生效矩阵（决策项，不展开实现）**：
+
+- 热生效：主题、日志级别、UI 偏好（无需重启/重扫）。
+- 需重扫 / 重建：库路径、每路径 `LibraryMode`、附件目录、扫描默认项（重建 `paths`、提示或触发重扫）。
+- 无需生效：备份路径、数据库优化等一次性操作参数。
+
+库路径变更流程：校验（存在 / 可读 / 去重）→ 需要时创建目录 → 重建 `paths` → 提示重扫。
+
+首次使用：库路径为空时提供引导（空态 CTA），避免必须手改 YAML。
+
+冻结区：`backend/manager/config`（按 `docs/FROZEN_RULES.md` 走 Plan）。
+
+重评时机：引入 DB 配置或多配置源时。
+
+## ADR-012：写路径统一模式
+
+决策：写路径统一为「后端写服务 + 前端统一表单」，不引入乐观更新（保守策略）。
+
+- 后端：`internal/app` 统一写服务模式——参数校验 → Repository 写方法 → 错误映射；不修改已有 Repository 接口（写能力已具备）。
+- 前端：统一「表单 + 字段 + 保存态 + 错误态」模式；复用 `SearchBox` / `EntityPicker` 等既有组件。
+- 保存失败保留表单内容；不做乐观更新与撤销（本阶段）。
+- `Studio.Merge` 缺失：**暂不新增**，等真实重名需求。
+
+理由：
+
+- 配置写与内容写共享同一套写路径基础设施，先建立可减少返工。
+- 无乐观更新可避免一致性问题，代价是保存后需刷新。
+
+重评时机：表单数量增长或交互体验出现明显问题时，抽独立组件库 / 引入乐观更新。
+
+参考：`docs/ROADMAP.md`（阶段 4-7）。
