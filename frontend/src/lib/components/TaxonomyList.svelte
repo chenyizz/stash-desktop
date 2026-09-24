@@ -9,9 +9,11 @@
   let {
     title,
     load,
+    hrefFor,
   }: {
     title: string;
     load: (query: string, page: number, pageSize: number) => Promise<PageResult>;
+    hrefFor?: (id: number) => string;
   } = $props();
 
   const PAGE_SIZE = 60;
@@ -67,9 +69,15 @@
   onMount(() => loadPage(1));
 </script>
 
+{#snippet cardBody(item: Item)}
+  <div class="avatar" style={`--hue: ${avatarHue(item.id)}`}>
+    {avatarInitial(item.name)}
+  </div>
+  <div class="name" title={item.name}>{item.name || "(未命名)"}</div>
+{/snippet}
+
 <main>
-  <div class="header">
-    <h2>{title}（共 {total}）</h2>
+  <div class="header">    <h2>{title}（共 {total}）</h2>
     <div class="header-actions">
       <SearchBox placeholder={`搜索${title}`} onchange={onSearch} />
       <button onclick={() => loadPage(page, query)} disabled={loading}>
@@ -88,12 +96,15 @@
 
   <div class="grid">
     {#each items as item (item.id)}
-      <div class="card">
-        <div class="avatar" style={`--hue: ${avatarHue(item.id)}`}>
-          {avatarInitial(item.name)}
+      {#if hrefFor}
+        <a class="card clickable" href={`#${hrefFor(item.id)}`}>
+          {@render cardBody(item)}
+        </a>
+      {:else}
+        <div class="card">
+          {@render cardBody(item)}
         </div>
-        <div class="name" title={item.name}>{item.name || "(未命名)"}</div>
-      </div>
+      {/if}
     {/each}
   </div>
 
@@ -154,6 +165,21 @@
     padding: 0.75rem;
     background: #fafafa;
     text-align: center;
+    display: block;
+    text-decoration: none;
+    color: inherit;
+  }
+  .card.clickable {
+    cursor: pointer;
+    transition: transform 0.15s;
+  }
+  .card.clickable:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  }
+  .card.clickable:focus-visible {
+    outline: 2px solid #202b33;
+    outline-offset: 2px;
   }
   .avatar {
     width: 100%;

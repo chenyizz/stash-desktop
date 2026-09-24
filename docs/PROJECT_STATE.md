@@ -31,6 +31,7 @@
 - 库路径扫描模式 `LibraryMode`（`Videos/Images/Attachments`，默认全开）：扫描分派与附件开关接入
 - 搜索：查询结构体入参（过滤只加字段）；IME 组合态 + 300ms 防抖 `SearchBox`；场景搜索覆盖 tag/演员/工作室
 - 过滤：`ScenesQuery.Filter`（已整理/评分/日期/tag/演员/工作室）+ `FilterBar`/`EntityPicker`（显式应用）
+- 演员详情页：`GetPerformer` + `PerformerDetailDTO` + `/performers/<id>/image` + `#/performers/:id`（列表卡片可点击）
 
 ## 当前焦点
 
@@ -51,8 +52,8 @@
 
 ## 最近变更
 
+- 演员详情页：`GetPerformer` + 详情 DTO（剔除敏感字段）+ 头像端点 + `#/performers/:id`；列表卡片可点击
 - 过滤：`internal/app/filter.go` + `FilterBar`/`EntityPicker`（已整理/评分/日期/tag/演员/工作室，显式应用）
-- 搜索：`ScenesQuery` 等结构体入参 + `normalizeQuery`（rune 上限）；`SearchBox.svelte`（IME+防抖）接入两个列表；场景搜索覆盖 tag/演员/工作室
 - 列表分页 + 标签/演员：`FindScenes` 返回 `ScenesPageDTO`；`SceneDTO` 含 `tags`/`performers`（本页批量取名称）
 - 扫描完成事件：`internal/app/events.go`（watcher + 契约 `scan:complete` + `{at}`）替代前端 `setTimeout`
 - 封面收尾：`CoverURL` 缓存参数改用 `md5(bytes)[:8]`（`UpdateCover` 不改 `updated_at`）；解码失败置空走占位

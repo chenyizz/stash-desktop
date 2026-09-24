@@ -53,6 +53,7 @@
 
 - Performer 隐藏字段（DTO/UI 不暴露，DB 保留，阶段 7 再决定删否）：`Ethnicity`、`HairColor`、`EyeColor`、`PenisLength`、`Circumcised`、`FakeTits`、`Piercings`、`StashIDs`。
 - `StashIDs` 模块：内部领域术语保留（ADR-009），前端 DTO/UI 一律不暴露。
+- 标签 / 工作室详情页未做（本阶段只做演员详情）；若需要按同模式补 `GetTag/GetStudio` 与详情组件。
 
 ## 一致性 / 命名
 

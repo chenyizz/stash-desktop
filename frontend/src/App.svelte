@@ -3,6 +3,7 @@
   import SceneList from "./lib/components/SceneList.svelte";
   import SceneDetail from "./lib/components/SceneDetail.svelte";
   import TaxonomyList from "./lib/components/TaxonomyList.svelte";
+  import PerformerDetail from "./lib/components/PerformerDetail.svelte";
   import { App } from "../bindings/case/internal/app";
   import { initRouter, isActive, NAV_ITEMS, route } from "./lib/router.svelte";
 
@@ -47,9 +48,11 @@
 
 {#if route.name === "scene"}
   <SceneDetail id={route.id} />
+{:else if route.name === "performer"}
+  <PerformerDetail id={route.id} />
 {:else if route.name === "performers"}
   {#key "performers"}
-    <TaxonomyList title="演员" load={loadPerformers} />
+    <TaxonomyList title="演员" load={loadPerformers} hrefFor={(id) => `/performers/${id}`} />
   {/key}
 {:else if route.name === "tags"}
   {#key "tags"}

@@ -1,5 +1,30 @@
 # CHANGELOG
 
+## 2026-09-24（阶段 3.12 - 演员详情页）
+
+### 新增
+
+- `internal/app/performer.go`：`PerformerDetailDTO` + `GetPerformer(id)` + `/performers/<id>/image` 端点；`performer_test.go` 映射用例
+- `frontend/src/lib/components/PerformerDetail.svelte`：演员详情（头像/元数据/别名/标签/链接）
+- 路由 `#/performers/:id`（router 增加 `performer`）
+
+### 修改
+
+- `internal/app/assets.go`：`AssetMiddleware` 增加 `/performers/` 分发
+- `TaxonomyList.svelte`：可选 `hrefFor` → 演员卡片可点击（`<a href="#/performers/:id">`，无死链）
+- `App.svelte`：分发 `PerformerDetail`，演员列表传 `hrefFor`
+- bindings 重新生成（12 Methods，新增 `PerformerDetailDTO`）
+
+### 展示策略
+
+- 不暴露：`Ethnicity/HairColor/EyeColor/PenisLength/Circumcised/FakeTits/Piercings/StashIDs`（DB 保留，阶段 7 再决定）；编号使用内部 `#ID`
+- 不提供 `sceneCount`；标签/工作室详情本阶段不做
+
+### 验证
+
+- `go build ./...`、`go vet ./internal/app/...`、`go test ./internal/app/...`：通过
+- `npm run check`：0 errors/0 warnings；`npm run build`：通过；`wails3 dev` 冒烟成功
+
 ## 2026-09-24（阶段 3.11 - 过滤）
 
 ### 新增

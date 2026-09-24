@@ -1,7 +1,7 @@
 // Minimal hash router. See docs/ARCHITECTURE.md ADR-006.
 // Routes: "#/", "#/scenes/<id>", "#/performers", "#/tags", "#/studios".
 
-export type RouteName = "scenes" | "scene" | "performers" | "tags" | "studios";
+export type RouteName = "scenes" | "scene" | "performers" | "performer" | "tags" | "studios";
 
 export type Route = {
   name: RouteName;
@@ -26,6 +26,7 @@ const ROUTES: Array<{ re: RegExp; name: RouteName }> = [
   { re: /^\/scenes\/(\d+)\/?$/, name: "scene" },
   { re: /^\/scenes\/?$/, name: "scenes" },
   { re: /^\/?$/, name: "scenes" },
+  { re: /^\/performers\/(\d+)\/?$/, name: "performer" },
   { re: /^\/performers\/?$/, name: "performers" },
   { re: /^\/tags\/?$/, name: "tags" },
   { re: /^\/studios\/?$/, name: "studios" },
@@ -65,10 +66,13 @@ export function initRouter(): () => void {
   return () => window.removeEventListener("hashchange", sync);
 }
 
-// 导航高亮：scene 详情视为 scenes 区。
+// 导航高亮：scene 详情视为 scenes 区，performer 详情视为 performers 区。
 export function isActive(name: RouteName): boolean {
   if (name === "scenes") {
     return route.name === "scenes" || route.name === "scene";
+  }
+  if (name === "performers") {
+    return route.name === "performers" || route.name === "performer";
   }
   return route.name === name;
 }

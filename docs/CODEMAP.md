@@ -151,6 +151,7 @@ func DateFromYear(year int) Date
 | ------------------ | ------------------------------------------------------------ |
 | `app.go` / `query.go` / `filter.go` | Wails 方法；查询/过滤入参（`ScenesQuery`/`ScenesFilter`）与 `buildSceneFilter` |
 | `scene.go`         | `GetScene` / `SceneDetailDTO` / `TagDTO` / `PerformerDTO` / `SceneFileDTO` |
+| `performer.go`     | `GetPerformer` / `PerformerDetailDTO` + `/performers/<id>/image` |
 | `cover.go` / `thumbnail.go` / `assets.go` / `attachment.go` | 封面/缩略图与附件端点；`AssetMiddleware` 按前缀分发 |
 | `events.go`        | `watchScanEvents`（扫描完成推送 `scan:complete`）             |
 | `taxonomy.go`      | `FindPerformers`/`FindTags`/`FindStudios` + 分类 Page DTO     |
@@ -163,7 +164,7 @@ func DateFromYear(year int) Date
 | 路径                      | 职责                                              |
 | ------------------------- | ------------------------------------------------- |
 | `App.svelte` / `main.ts`  | 路由 shell（列表 ↔ 详情）与入口挂载              |
-| `lib/`                    | `router.svelte.ts`（hash 路由）、`Pager.svelte`、`components/`（SceneList/SceneDetail/TaxonomyList/SearchBox/FilterBar/EntityPicker）、`format.ts`、`external.ts`、`events.ts` |
+| `lib/`                    | `router.svelte.ts`（hash 路由）、`Pager.svelte`、`components/`（SceneList/SceneDetail/PerformerDetail/TaxonomyList/SearchBox/FilterBar/EntityPicker）、`format.ts`、`external.ts`、`events.ts` |
 
 ---
 
@@ -193,6 +194,7 @@ git diff --name-only HEAD -- backend/manager backend/pkg  # 找冻结区改动
 
 | 日期       | 变更                                                         |
 | ---------- | ------------------------------------------------------------ |
+| 2026-09-24 | 阶段 3.12：演员详情页（`performer.go` + `PerformerDetail.svelte` + `/performers/<id>/image`） |
 | 2026-09-24 | 阶段 3.11：过滤（`filter.go` + `FilterBar`/`EntityPicker`） |
 | 2026-09-24 | 阶段 3.10：搜索（查询结构体 + `SearchBox`；场景搜索覆盖 tag/演员/工作室） |
 | 2026-09-24 | 阶段 3.9：`LibraryMode` 结构/默认/校验 + 扫描分派 |
