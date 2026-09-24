@@ -1,5 +1,30 @@
 # CHANGELOG
 
+## 2026-09-24（阶段 3.10 - 搜索）
+
+### 新增
+
+- `internal/app/query.go`：`ScenesQuery`/`PerformersQuery`/`TagsQuery`/`StudiosQuery` 查询结构体（过滤字段后续只加字段，签名不变）；`normalizeQuery`（trim、空→nil、按 rune 截断 256）
+- `frontend/src/lib/components/SearchBox.svelte`：统一搜索框（IME 组合态、300ms 防抖、清空）
+- 场景搜索覆盖关联 `tag` / 演员 / 工作室名称（`sqlite/scene.go` 搜索列扩展；集成用例 `TestSceneQueryQ_RelatedNames`）
+
+### 修改
+
+- `internal/app`：`FindScenes`/`FindPerformers`/`FindTags`/`FindStudios` 改为结构体入参并设置 `findFilter.Q`
+- `SceneList.svelte` / `TaxonomyList.svelte`：接入 `SearchBox`、`requestId` 丢弃过期响应、搜索重置第 1 页
+- `App.svelte`：适配新签名
+- bindings 重新生成（新增 4 个查询模型）
+
+### 验证
+
+- `go build ./...`、`go test ./internal/app/...`：通过
+- `go test -tags integration ./backend/pkg/sqlite -run TestSceneQueryQ`：全部 PASS（含新增关联名用例）
+- `npm run check`：0 errors；`npm run build`：通过；`wails3 dev` 冒烟成功
+
+### 说明
+
+- 搜索基于 `LIKE`（无 FTS）；新增 join 仅在有查询时生效。技术债见 TECH_DEBT
+
 ## 2026-09-24（阶段 3.9 - LibraryMode 扫描分派）
 
 ### 新增

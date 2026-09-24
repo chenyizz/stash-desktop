@@ -203,12 +203,12 @@ func (a *App) ScanLibrary(path string) (int, error) {
 }
 
 // FindScenes 分页查询场景列表，返回分页结果与总数。
-func (a *App) FindScenes(page int, pageSize int) (*ScenesPageDTO, error) {
+func (a *App) FindScenes(input ScenesQuery) (*ScenesPageDTO, error) {
 	if a.mgr == nil {
 		return nil, fmt.Errorf("manager 未初始化")
 	}
 
-	page, pageSize = normalizePage(page, pageSize)
+	query, page, pageSize := normalizeListQuery(input.Query, input.Page, input.PageSize)
 
 	var dtos []SceneDTO
 	total := 0
@@ -217,6 +217,7 @@ func (a *App) FindScenes(page int, pageSize int) (*ScenesPageDTO, error) {
 		findFilter := &models.FindFilterType{
 			Page:    &page,
 			PerPage: &pageSize,
+			Q:       query,
 		}
 
 		result, err := a.mgr.Repository.Scene.Query(ctx, models.SceneQueryOptions{

@@ -1,6 +1,7 @@
 <script lang="ts">
   import { onMount } from "svelte";
   import Pager from "../Pager.svelte";
+  import SearchBox from "./SearchBox.svelte";
 
   type Item = { id: number; name: string };
   type PageResult = { items: Item[]; total: number; page: number };
@@ -10,7 +11,7 @@
     load,
   }: {
     title: string;
-    load: (page: number, pageSize: number) => Promise<PageResult>;
+    load: (query: string, page: number, pageSize: number) => Promise<PageResult>;
   } = $props();
 
   const PAGE_SIZE = 60;
@@ -20,20 +21,30 @@
   let page = $state(1);
   let loading = $state(false);
   let error = $state("");
+  let query = $state("");
+  let requestId = 0;
 
-  async function loadPage(target = page) {
+  async function loadPage(target = page, q = query) {
+    const req = ++requestId;
     loading = true;
     error = "";
     try {
-      const result = await load(target, PAGE_SIZE);
+      const result = await load(q, target, PAGE_SIZE);
+      if (req !== requestId) return;
       items = result.items ?? [];
       total = result.total ?? 0;
       page = result.page ?? target;
     } catch (e) {
+      if (req !== requestId) return;
       error = `加载失败: ${e}`;
     } finally {
-      loading = false;
+      if (req === requestId) loading = false;
     }
+  }
+
+  function onSearch(q: string) {
+    query = q;
+    loadPage(1, q);
   }
 
   let totalPages = $derived(Math.max(1, Math.ceil(total / PAGE_SIZE)));
@@ -41,7 +52,7 @@
   function gotoPage(target: number) {
     const next = Math.min(Math.max(1, target), totalPages);
     if (next !== page) {
-      loadPage(next);
+      loadPage(next, query);
     }
   }
 
@@ -59,9 +70,12 @@
 <main>
   <div class="header">
     <h2>{title}（共 {total}）</h2>
-    <button onclick={() => loadPage()} disabled={loading}>
-      {loading ? "加载中..." : "刷新"}
-    </button>
+    <div class="header-actions">
+      <SearchBox placeholder={`搜索${title}`} onchange={onSearch} />
+      <button onclick={() => loadPage(page, query)} disabled={loading}>
+        {loading ? "加载中..." : "刷新"}
+      </button>
+    </div>
   </div>
 
   {#if error}
@@ -98,6 +112,12 @@
     justify-content: space-between;
     align-items: center;
     margin-bottom: 1rem;
+    gap: 0.5rem;
+  }
+  .header-actions {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
   }
   button {
     padding: 0.5rem 1rem;

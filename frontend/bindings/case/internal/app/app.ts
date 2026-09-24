@@ -16,29 +16,29 @@ import * as $models from "./models.js";
 /**
  * FindPerformers 分页查询演员列表。
  */
-export function FindPerformers(page: number, pageSize: number): $CancellablePromise<$models.PerformersPageDTO | null> {
-    return $Call.ByID(2212267212, page, pageSize);
+export function FindPerformers(input: $models.PerformersQuery): $CancellablePromise<$models.PerformersPageDTO | null> {
+    return $Call.ByID(2212267212, input);
 }
 
 /**
  * FindScenes 分页查询场景列表，返回分页结果与总数。
  */
-export function FindScenes(page: number, pageSize: number): $CancellablePromise<$models.ScenesPageDTO | null> {
-    return $Call.ByID(3579858290, page, pageSize);
+export function FindScenes(input: $models.ScenesQuery): $CancellablePromise<$models.ScenesPageDTO | null> {
+    return $Call.ByID(3579858290, input);
 }
 
 /**
  * FindStudios 分页查询工作室列表。
  */
-export function FindStudios(page: number, pageSize: number): $CancellablePromise<$models.StudiosPageDTO | null> {
-    return $Call.ByID(2077282170, page, pageSize);
+export function FindStudios(input: $models.StudiosQuery): $CancellablePromise<$models.StudiosPageDTO | null> {
+    return $Call.ByID(2077282170, input);
 }
 
 /**
  * FindTags 分页查询标签列表。
  */
-export function FindTags(page: number, pageSize: number): $CancellablePromise<$models.TagsPageDTO | null> {
-    return $Call.ByID(3917363242, page, pageSize);
+export function FindTags(input: $models.TagsQuery): $CancellablePromise<$models.TagsPageDTO | null> {
+    return $Call.ByID(3917363242, input);
 }
 
 /**

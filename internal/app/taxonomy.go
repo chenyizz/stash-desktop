@@ -36,16 +36,16 @@ type StudiosPageDTO struct {
 }
 
 // FindPerformers 分页查询演员列表。
-func (a *App) FindPerformers(page int, pageSize int) (*PerformersPageDTO, error) {
+func (a *App) FindPerformers(input PerformersQuery) (*PerformersPageDTO, error) {
 	if a.mgr == nil {
 		return nil, fmt.Errorf("manager 未初始化")
 	}
-	page, pageSize = normalizePage(page, pageSize)
+	query, page, pageSize := normalizeListQuery(input.Query, input.Page, input.PageSize)
 
 	var items []PerformerDTO
 	total := 0
 	err := a.mgr.Repository.WithReadTxn(context.Background(), func(ctx context.Context) error {
-		findFilter := &models.FindFilterType{Page: &page, PerPage: &pageSize}
+		findFilter := &models.FindFilterType{Page: &page, PerPage: &pageSize, Q: query}
 		performers, count, err := a.mgr.Repository.Performer.Query(ctx, &models.PerformerFilterType{}, findFilter)
 		if err != nil {
 			return err
@@ -66,16 +66,16 @@ func (a *App) FindPerformers(page int, pageSize int) (*PerformersPageDTO, error)
 }
 
 // FindTags 分页查询标签列表。
-func (a *App) FindTags(page int, pageSize int) (*TagsPageDTO, error) {
+func (a *App) FindTags(input TagsQuery) (*TagsPageDTO, error) {
 	if a.mgr == nil {
 		return nil, fmt.Errorf("manager 未初始化")
 	}
-	page, pageSize = normalizePage(page, pageSize)
+	query, page, pageSize := normalizeListQuery(input.Query, input.Page, input.PageSize)
 
 	var items []TagDTO
 	total := 0
 	err := a.mgr.Repository.WithReadTxn(context.Background(), func(ctx context.Context) error {
-		findFilter := &models.FindFilterType{Page: &page, PerPage: &pageSize}
+		findFilter := &models.FindFilterType{Page: &page, PerPage: &pageSize, Q: query}
 		tags, count, err := a.mgr.Repository.Tag.Query(ctx, &models.TagFilterType{}, findFilter)
 		if err != nil {
 			return err
@@ -96,16 +96,16 @@ func (a *App) FindTags(page int, pageSize int) (*TagsPageDTO, error) {
 }
 
 // FindStudios 分页查询工作室列表。
-func (a *App) FindStudios(page int, pageSize int) (*StudiosPageDTO, error) {
+func (a *App) FindStudios(input StudiosQuery) (*StudiosPageDTO, error) {
 	if a.mgr == nil {
 		return nil, fmt.Errorf("manager 未初始化")
 	}
-	page, pageSize = normalizePage(page, pageSize)
+	query, page, pageSize := normalizeListQuery(input.Query, input.Page, input.PageSize)
 
 	var items []StudioDTO
 	total := 0
 	err := a.mgr.Repository.WithReadTxn(context.Background(), func(ctx context.Context) error {
-		findFilter := &models.FindFilterType{Page: &page, PerPage: &pageSize}
+		findFilter := &models.FindFilterType{Page: &page, PerPage: &pageSize, Q: query}
 		studios, count, err := a.mgr.Repository.Studio.Query(ctx, &models.StudioFilterType{}, findFilter)
 		if err != nil {
 			return err

@@ -5,6 +5,7 @@
   import { navigate } from "../router.svelte";
   import { SCAN_COMPLETE } from "../events";
   import Pager from "../Pager.svelte";
+  import SearchBox from "./SearchBox.svelte";
 
   let scanPath = $state("");
   let scanResult = $state("");
@@ -15,6 +16,8 @@
   let scenesError = $state("");
   let page = $state(1);
   let total = $state(0);
+  let query = $state("");
+  let requestId = 0;
 
   const PAGE_SIZE = 50;
 
@@ -35,19 +38,27 @@
     }
   }
 
-  async function loadScenes(target = page) {
+  async function loadScenes(target = page, q = query) {
+    const req = ++requestId;
     scenesLoading = true;
     scenesError = "";
     try {
-      const result = await App.FindScenes(target, PAGE_SIZE);
+      const result = await App.FindScenes({ query: q, page: target, pageSize: PAGE_SIZE });
+      if (req !== requestId) return;
       scenes = result?.scenes ?? [];
       total = result?.total ?? 0;
       page = result?.page ?? target;
     } catch (e) {
+      if (req !== requestId) return;
       scenesError = `加载失败: ${e}`;
     } finally {
-      scenesLoading = false;
+      if (req === requestId) scenesLoading = false;
     }
+  }
+
+  function onSearch(q: string) {
+    query = q;
+    loadScenes(1, q);
   }
 
   let totalPages = $derived(Math.max(1, Math.ceil(total / PAGE_SIZE)));
@@ -55,7 +66,7 @@
   function gotoPage(target: number) {
     const next = Math.min(Math.max(1, target), totalPages);
     if (next !== page) {
-      loadScenes(next);
+      loadScenes(next, query);
     }
   }
 
@@ -71,7 +82,7 @@
     offScan = Events.On(SCAN_COMPLETE, () => {
       scanning = false;
       scanResult = "✅ 扫描完成，已刷新列表";
-      loadScenes(1);
+      loadScenes(1, query);
     });
   });
 
@@ -102,9 +113,15 @@
   <div class="scenes-section">
     <div class="header">
       <h2>场景列表（共 {total}）</h2>
-      <button onclick={() => loadScenes()} disabled={scenesLoading}>
-        {scenesLoading ? "加载中..." : "刷新"}
-      </button>
+      <div class="header-actions">
+        <SearchBox
+          placeholder="搜索标题 / 简介 / 标签 / 演员 / 工作室"
+          onchange={onSearch}
+        />
+        <button onclick={() => loadScenes(page, query)} disabled={scenesLoading}>
+          {scenesLoading ? "加载中..." : "刷新"}
+        </button>
+      </div>
     </div>
 
     {#if scenesError}
@@ -227,6 +244,11 @@
     justify-content: space-between;
     align-items: center;
     margin-bottom: 1rem;
+  }
+  .header-actions {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
   }
   .scene-grid {
     display: grid;

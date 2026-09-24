@@ -10,12 +10,16 @@ export type {
     AttachmentDTO,
     PerformerDTO,
     PerformersPageDTO,
+    PerformersQuery,
     SceneDTO,
     SceneDetailDTO,
     SceneFileDTO,
     ScenesPageDTO,
+    ScenesQuery,
     StudioDTO,
     StudiosPageDTO,
+    StudiosQuery,
     TagDTO,
-    TagsPageDTO
+    TagsPageDTO,
+    TagsQuery
 } from "./models.js";

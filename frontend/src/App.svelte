@@ -9,8 +9,8 @@
   type Item = { id: number; name: string };
   type PageResult = { items: Item[]; total: number; page: number };
 
-  async function loadPerformers(page: number, pageSize: number): Promise<PageResult> {
-    const r = await App.FindPerformers(page, pageSize);
+  async function loadPerformers(query: string, page: number, pageSize: number): Promise<PageResult> {
+    const r = await App.FindPerformers({ query, page, pageSize });
     return {
       items: (r?.performers ?? []).map((p) => ({ id: p.id, name: p.name })),
       total: r?.total ?? 0,
@@ -18,8 +18,8 @@
     };
   }
 
-  async function loadTags(page: number, pageSize: number): Promise<PageResult> {
-    const r = await App.FindTags(page, pageSize);
+  async function loadTags(query: string, page: number, pageSize: number): Promise<PageResult> {
+    const r = await App.FindTags({ query, page, pageSize });
     return {
       items: (r?.tags ?? []).map((t) => ({ id: t.id, name: t.name })),
       total: r?.total ?? 0,
@@ -27,8 +27,8 @@
     };
   }
 
-  async function loadStudios(page: number, pageSize: number): Promise<PageResult> {
-    const r = await App.FindStudios(page, pageSize);
+  async function loadStudios(query: string, page: number, pageSize: number): Promise<PageResult> {
+    const r = await App.FindStudios({ query, page, pageSize });
     return {
       items: (r?.studios ?? []).map((s) => ({ id: s.id, name: s.name })),
       total: r?.total ?? 0,

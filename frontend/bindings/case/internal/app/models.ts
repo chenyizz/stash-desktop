@@ -26,6 +26,12 @@ export interface PerformersPageDTO {
     "pageSize": number;
 }
 
+export interface PerformersQuery {
+    "query": string;
+    "page": number;
+    "pageSize": number;
+}
+
 export interface SceneDTO {
     "id": number;
     "title": string;
@@ -122,6 +128,15 @@ export interface ScenesPageDTO {
 }
 
 /**
+ * ScenesQuery 是场景列表的查询入参（过滤字段将在后续子步骤中追加，方法签名不变）。
+ */
+export interface ScenesQuery {
+    "query": string;
+    "page": number;
+    "pageSize": number;
+}
+
+/**
  * StudioDTO 是工作室的列表项。
  */
 export interface StudioDTO {
@@ -132,6 +147,12 @@ export interface StudioDTO {
 export interface StudiosPageDTO {
     "studios": StudioDTO[] | null;
     "total": number;
+    "page": number;
+    "pageSize": number;
+}
+
+export interface StudiosQuery {
+    "query": string;
     "page": number;
     "pageSize": number;
 }
@@ -148,6 +169,12 @@ export interface TagDTO {
 export interface TagsPageDTO {
     "tags": TagDTO[] | null;
     "total": number;
+    "page": number;
+    "pageSize": number;
+}
+
+export interface TagsQuery {
+    "query": string;
     "page": number;
     "pageSize": number;
 }
