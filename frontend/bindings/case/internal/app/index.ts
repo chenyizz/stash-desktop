@@ -9,6 +9,7 @@ export {
 export {
     AttachmentDTO,
     PerformerDTO,
+    PerformerDetailDTO,
     PerformersPageDTO,
     PerformersQuery,
     SceneDTO,

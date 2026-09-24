@@ -57,11 +57,20 @@ export function GetDataDir(): $CancellablePromise<string> {
 }
 
 /**
+ * GetPerformer 返回演员详情。
+ */
+export function GetPerformer(id: number): $CancellablePromise<$models.PerformerDetailDTO | null> {
+    return $Call.ByID(3749965918, id).then(($result: any) => {
+        return $$createType9($result);
+    });
+}
+
+/**
  * GetScene returns the full detail DTO for a single scene.
  */
 export function GetScene(id: number): $CancellablePromise<$models.SceneDetailDTO | null> {
     return $Call.ByID(3442445960, id).then(($result: any) => {
-        return $$createType9($result);
+        return $$createType11($result);
     });
 }
 
@@ -70,7 +79,7 @@ export function GetScene(id: number): $CancellablePromise<$models.SceneDetailDTO
  */
 export function GetSystemStatus(): $CancellablePromise<{ [_ in string]?: any }> {
     return $Call.ByID(2642847171).then(($result: any) => {
-        return $$createType10($result);
+        return $$createType12($result);
     });
 }
 
@@ -108,6 +117,8 @@ const $$createType4 = $models.StudiosPageDTO.createFrom;
 const $$createType5 = $Create.Nullable($$createType4);
 const $$createType6 = $models.TagsPageDTO.createFrom;
 const $$createType7 = $Create.Nullable($$createType6);
-const $$createType8 = $models.SceneDetailDTO.createFrom;
+const $$createType8 = $models.PerformerDetailDTO.createFrom;
 const $$createType9 = $Create.Nullable($$createType8);
-const $$createType10 = $Create.Map($Create.Any, $Create.Any);
+const $$createType10 = $models.SceneDetailDTO.createFrom;
+const $$createType11 = $Create.Nullable($$createType10);
+const $$createType12 = $Create.Map($Create.Any, $Create.Any);

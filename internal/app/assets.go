@@ -8,8 +8,9 @@ import (
 )
 
 const (
-	coverURLPrefix      = "/covers/"
-	attachmentURLPrefix = "/attachments/"
+	coverURLPrefix          = "/covers/"
+	attachmentURLPrefix     = "/attachments/"
+	performerImageURLPrefix = "/performers/"
 )
 
 // AssetMiddleware 仅按前缀分发到对应 handler，保持中间件无业务分支。
@@ -22,6 +23,8 @@ func AssetMiddleware(a *App) application.Middleware {
 				a.handleCover(w, r)
 			case strings.HasPrefix(r.URL.Path, attachmentURLPrefix):
 				a.handleAttachment(w, r)
+			case strings.HasPrefix(r.URL.Path, performerImageURLPrefix):
+				a.handlePerformerImage(w, r)
 			default:
 				next.ServeHTTP(w, r)
 			}

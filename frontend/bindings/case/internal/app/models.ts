@@ -69,6 +69,131 @@ export class PerformerDTO {
     }
 }
 
+/**
+ * PerformerDetailDTO 是演员详情。按展示策略剔除：Ethnicity/HairColor/EyeColor/
+ * PenisLength/Circumcised/FakeTits/Piercings/StashIDs（见 docs/TECH_DEBT.md）。
+ */
+export class PerformerDetailDTO {
+    "id": number;
+    "name": string;
+    "disambiguation": string;
+    "gender": string;
+    "birthdate": string;
+    "deathDate": string;
+    "country": string;
+    "height": number | null;
+    "weight": number | null;
+    "measurements": string;
+    "careerStart": string;
+    "careerEnd": string;
+    "tattoos": string;
+    "favorite": boolean;
+
+    /**
+     * Rating expressed in 1-100 scale; 0 means no rating.
+     */
+    "rating": number;
+    "details": string;
+    "aliases": string[];
+    "urls": string[];
+    "tags": TagDTO[];
+    "imageUrl": string;
+    "createdAt": string;
+    "updatedAt": string;
+
+    /** Creates a new PerformerDetailDTO instance. */
+    constructor($$source: Partial<PerformerDetailDTO> = {}) {
+        if (!("id" in $$source)) {
+            this["id"] = 0;
+        }
+        if (!("name" in $$source)) {
+            this["name"] = "";
+        }
+        if (!("disambiguation" in $$source)) {
+            this["disambiguation"] = "";
+        }
+        if (!("gender" in $$source)) {
+            this["gender"] = "";
+        }
+        if (!("birthdate" in $$source)) {
+            this["birthdate"] = "";
+        }
+        if (!("deathDate" in $$source)) {
+            this["deathDate"] = "";
+        }
+        if (!("country" in $$source)) {
+            this["country"] = "";
+        }
+        if (!("height" in $$source)) {
+            this["height"] = null;
+        }
+        if (!("weight" in $$source)) {
+            this["weight"] = null;
+        }
+        if (!("measurements" in $$source)) {
+            this["measurements"] = "";
+        }
+        if (!("careerStart" in $$source)) {
+            this["careerStart"] = "";
+        }
+        if (!("careerEnd" in $$source)) {
+            this["careerEnd"] = "";
+        }
+        if (!("tattoos" in $$source)) {
+            this["tattoos"] = "";
+        }
+        if (!("favorite" in $$source)) {
+            this["favorite"] = false;
+        }
+        if (!("rating" in $$source)) {
+            this["rating"] = 0;
+        }
+        if (!("details" in $$source)) {
+            this["details"] = "";
+        }
+        if (!("aliases" in $$source)) {
+            this["aliases"] = [];
+        }
+        if (!("urls" in $$source)) {
+            this["urls"] = [];
+        }
+        if (!("tags" in $$source)) {
+            this["tags"] = [];
+        }
+        if (!("imageUrl" in $$source)) {
+            this["imageUrl"] = "";
+        }
+        if (!("createdAt" in $$source)) {
+            this["createdAt"] = "";
+        }
+        if (!("updatedAt" in $$source)) {
+            this["updatedAt"] = "";
+        }
+
+        Object.assign(this, $$source);
+    }
+
+    /**
+     * Creates a new PerformerDetailDTO instance from a string or object.
+     */
+    static createFrom($$source: any = {}): PerformerDetailDTO {
+        const $$createField16_0 = $$createType0;
+        const $$createField17_0 = $$createType0;
+        const $$createField18_0 = $$createType2;
+        let $$parsedSource = typeof $$source === 'string' ? JSON.parse($$source) : $$source;
+        if ("aliases" in $$parsedSource) {
+            $$parsedSource["aliases"] = $$createField16_0($$parsedSource["aliases"]);
+        }
+        if ("urls" in $$parsedSource) {
+            $$parsedSource["urls"] = $$createField17_0($$parsedSource["urls"]);
+        }
+        if ("tags" in $$parsedSource) {
+            $$parsedSource["tags"] = $$createField18_0($$parsedSource["tags"]);
+        }
+        return new PerformerDetailDTO($$parsedSource as Partial<PerformerDetailDTO>);
+    }
+}
+
 export class PerformersPageDTO {
     "performers": PerformerDTO[];
     "total": number;
@@ -97,7 +222,7 @@ export class PerformersPageDTO {
      * Creates a new PerformersPageDTO instance from a string or object.
      */
     static createFrom($$source: any = {}): PerformersPageDTO {
-        const $$createField0_0 = $$createType1;
+        const $$createField0_0 = $$createType4;
         let $$parsedSource = typeof $$source === 'string' ? JSON.parse($$source) : $$source;
         if ("performers" in $$parsedSource) {
             $$parsedSource["performers"] = $$createField0_0($$parsedSource["performers"]);
@@ -187,8 +312,8 @@ export class SceneDTO {
      * Creates a new SceneDTO instance from a string or object.
      */
     static createFrom($$source: any = {}): SceneDTO {
-        const $$createField6_0 = $$createType3;
-        const $$createField7_0 = $$createType1;
+        const $$createField6_0 = $$createType2;
+        const $$createField7_0 = $$createType4;
         let $$parsedSource = typeof $$source === 'string' ? JSON.parse($$source) : $$source;
         if ("tags" in $$parsedSource) {
             $$parsedSource["tags"] = $$createField6_0($$parsedSource["tags"]);
@@ -360,9 +485,9 @@ export class SceneDetailDTO {
      * Creates a new SceneDetailDTO instance from a string or object.
      */
     static createFrom($$source: any = {}): SceneDetailDTO {
-        const $$createField11_0 = $$createType4;
-        const $$createField12_0 = $$createType3;
-        const $$createField13_0 = $$createType1;
+        const $$createField11_0 = $$createType0;
+        const $$createField12_0 = $$createType2;
+        const $$createField13_0 = $$createType4;
         const $$createField17_0 = $$createType6;
         const $$createField29_0 = $$createType8;
         let $$parsedSource = typeof $$source === 'string' ? JSON.parse($$source) : $$source;
@@ -772,7 +897,7 @@ export class TagsPageDTO {
      * Creates a new TagsPageDTO instance from a string or object.
      */
     static createFrom($$source: any = {}): TagsPageDTO {
-        const $$createField0_0 = $$createType3;
+        const $$createField0_0 = $$createType2;
         let $$parsedSource = typeof $$source === 'string' ? JSON.parse($$source) : $$source;
         if ("tags" in $$parsedSource) {
             $$parsedSource["tags"] = $$createField0_0($$parsedSource["tags"]);
@@ -811,11 +936,11 @@ export class TagsQuery {
 }
 
 // Private type creation functions
-const $$createType0 = PerformerDTO.createFrom;
-const $$createType1 = $Create.Array($$createType0);
-const $$createType2 = TagDTO.createFrom;
-const $$createType3 = $Create.Array($$createType2);
-const $$createType4 = $Create.Array($Create.Any);
+const $$createType0 = $Create.Array($Create.Any);
+const $$createType1 = TagDTO.createFrom;
+const $$createType2 = $Create.Array($$createType1);
+const $$createType3 = PerformerDTO.createFrom;
+const $$createType4 = $Create.Array($$createType3);
 const $$createType5 = AttachmentDTO.createFrom;
 const $$createType6 = $Create.Array($$createType5);
 const $$createType7 = SceneFileDTO.createFrom;
