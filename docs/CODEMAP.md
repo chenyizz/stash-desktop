@@ -162,7 +162,7 @@ func DateFromYear(year int) Date
 | 路径                      | 职责                                              |
 | ------------------------- | ------------------------------------------------- |
 | `App.svelte` / `main.ts`  | 路由 shell（列表 ↔ 详情）与入口挂载              |
-| `lib/`                    | `router.svelte.ts`（hash 路由）、`components/`（SceneList/SceneDetail）、`format.ts`、`external.ts`、`events.ts` |
+| `lib/`                    | `router.svelte.ts`（hash 路由）、`Pager.svelte`、`components/`（SceneList/SceneDetail）、`format.ts`、`external.ts`、`events.ts` |
 
 ---
 

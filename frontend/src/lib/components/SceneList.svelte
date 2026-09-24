@@ -4,6 +4,7 @@
   import { App } from "../../../bindings/case/internal/app";
   import { navigate } from "../router.svelte";
   import { SCAN_COMPLETE } from "../events";
+  import Pager from "../Pager.svelte";
 
   let scanPath = $state("");
   let scanResult = $state("");
@@ -154,17 +155,7 @@
       {/each}
     </div>
 
-    {#if totalPages > 1}
-      <div class="pager">
-        <button onclick={() => gotoPage(page - 1)} disabled={page <= 1 || scenesLoading}>
-          上一页
-        </button>
-        <span>第 {page} / {totalPages} 页</span>
-        <button onclick={() => gotoPage(page + 1)} disabled={page >= totalPages || scenesLoading}>
-          下一页
-        </button>
-      </div>
-    {/if}
+    <Pager {page} {totalPages} loading={scenesLoading} onGoto={gotoPage} />
   </div>
 </main>
 
@@ -318,18 +309,5 @@
     font-size: 0.75rem;
     color: #999;
     margin-top: 0.25rem;
-  }
-  .pager {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 1rem;
-    margin-top: 1.5rem;
-    font-size: 0.9rem;
-    color: #555;
-  }
-  .pager button:disabled {
-    opacity: 0.4;
-    cursor: not-allowed;
   }
 </style>

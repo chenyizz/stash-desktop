@@ -1,5 +1,15 @@
 # CHANGELOG
 
+## 2026-09-24（阶段 3.4 - 前端重构：抽出 Pager）
+
+### 修改
+
+- 新增 `frontend/src/lib/Pager.svelte`（通用分页器）；`SceneList.svelte` 改用之，移除内联分页标记与样式
+
+### 验证
+
+- `npm run check`：0 errors；`npm run build`：通过；`wails3 dev` 冒烟成功
+
 ## 2026-09-24（阶段 3.3 - 列表标签/演员）
 
 ### 新增
