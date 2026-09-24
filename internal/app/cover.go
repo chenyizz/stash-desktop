@@ -9,16 +9,12 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/wailsapp/wails/v3/pkg/application"
-
 	"case/backend/pkg/hash/md5"
 	"case/backend/pkg/logger"
 	"case/backend/pkg/metadata/cover"
 	"case/backend/pkg/scene/generate"
 	"case/backend/pkg/utils"
 )
-
-const coverURLPrefix = "/covers/"
 
 // ensureCover returns the URL and dimensions of a scene's cover, generating and
 // persisting one on demand when none exists yet. Failures are logged and
@@ -90,21 +86,6 @@ func (a *App) screenshotFunc(videoPath string, width int, duration float64) cove
 		}
 
 		return generator.Screenshot(ctx, videoPath, width, duration, generate.ScreenshotOptions{At: &at})
-	}
-}
-
-// CoverMiddleware 仅按前缀分发到封面 handler（保持中间件无业务分支）。
-// 它是包级函数而非 App 方法，避免被 Wails 绑定为前端可调方法。
-func CoverMiddleware(a *App) application.Middleware {
-	return func(next http.Handler) http.Handler {
-		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-			if !strings.HasPrefix(r.URL.Path, coverURLPrefix) {
-				next.ServeHTTP(w, r)
-				return
-			}
-
-			a.handleCover(w, r)
-		})
 	}
 }
 

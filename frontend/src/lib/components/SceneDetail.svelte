@@ -123,6 +123,20 @@
       </section>
     {/if}
 
+    {#if (scene.attachments ?? []).length > 0}
+      <section>
+        <h2>附件</h2>
+        <div class="attachments">
+          {#each scene.attachments ?? [] as attachment}
+            <figure>
+              <img src={attachment.url} alt={attachment.name} loading="lazy" />
+              <figcaption>{attachment.name}</figcaption>
+            </figure>
+          {/each}
+        </div>
+      </section>
+    {/if}
+
     {#if (scene.urls ?? []).length > 0}
       <section>
         <h2>链接</h2>
@@ -300,6 +314,30 @@
   .urls {
     margin: 0;
     padding-left: 1.1rem;
+  }
+  .attachments {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+    gap: 0.75rem;
+  }
+  .attachments figure {
+    margin: 0;
+  }
+  .attachments img {
+    width: 100%;
+    aspect-ratio: 16 / 9;
+    object-fit: cover;
+    border-radius: 6px;
+    display: block;
+    background: #1c1c1c;
+  }
+  .attachments figcaption {
+    font-size: 0.75rem;
+    color: #888;
+    margin-top: 0.25rem;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
   }
   .urls a {
     color: #1a5fb4;

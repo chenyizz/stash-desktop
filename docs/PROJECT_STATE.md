@@ -27,6 +27,7 @@
 - 列表标签/演员：`SceneDTO` 扩展结构化 `tags/performers`（本页批量取名称）+ 前端 chips
 - 演员/标签/工作室列表页：`FindPerformers` / `FindTags` / `FindStudios`（分页）+ 通用 `TaxonomyList` + 顶部导航
 - 封面缩略图 + 列表海报墙：`/covers/<id>?w=320`（imaging 缩放 + 磁盘缓存/ETag），卡片 16/9 海报
+- 详情页附件（D2 方案 A）：`backend/pkg/metadata/attachments` + `/attachments/<sceneID>/<index>` + 详情页附件区块（不入库）
 
 ## 当前焦点
 
@@ -46,8 +47,8 @@
 
 ## 最近变更
 
+- 详情页附件（D2 方案 A）：`attachments` resolver + `/attachments` 端点 + 详情页区块；中间件改为 `AssetMiddleware` 前缀分发
 - 封面缩略图/海报墙：`internal/app/thumbnail.go`（imaging + 磁盘缓存 + ETag + 启动孤儿清理）；列表卡片 16/9 海报
-- 演员/标签/工作室列表页：`internal/app/taxonomy.go` + `TaxonomyList.svelte`（响应式网格，60/页）+ 导航由 router 导出
 - 列表分页 + 标签/演员：`FindScenes` 返回 `ScenesPageDTO`；`SceneDTO` 含 `tags`/`performers`（本页批量取名称）
 - 扫描完成事件：`internal/app/events.go`（watcher + 契约 `scan:complete` + `{at}`）替代前端 `setTimeout`
 - 封面收尾：`CoverURL` 缓存参数改用 `md5(bytes)[:8]`（`UpdateCover` 不改 `updated_at`）；解码失败置空走占位

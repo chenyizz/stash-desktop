@@ -52,10 +52,10 @@ type LibraryMode struct {
 | B custom fields 存 JSON 字符串 | 零冻结区改动 | custom fields 用户可编辑，需保留键命名空间；每次 `json.Unmarshal`；属 hack（`custom_fields.go:116-120` 明确不支持数组/对象） | 无 |
 | C 新建 `scene_attachments` 表 | 新表 + 迁移 + Repository + DTO（**碰冻结区**） | 迁移与维护成本 | 可搜索、可过滤、可统计、可加元数据（描述/标签/顺序） |
 
-**结论**：
-> 附件机制将在**阶段 3 详情页附件功能实现时决策**。候选 A/B/C 及成本如上述。
-> 决策依据：附件数量级、是否需要元数据、是否参与搜索。
-> **当前不做任何附件入库或索引。**
+**结论：已决策（阶段 3）**
+> 附件机制采用**方案 A 文件系统直读**：扫描时/详情时识别 `<视频目录>/{fanart,poster,extra}/**`，由 `/attachments/<sceneID>/<index>` 按需提供，**不入库、不索引、不搜索**。
+> 候选 B（custom fields JSON）与 C（`scene_attachments` 表）保留为将来扩展：当附件需要元数据/搜索/统计时升级到 C。
+> `Attachments` 开关由 `LibraryMode`（D1）控制（阶段 3 落地）。
 
 ### D3 图片集复用 Gallery（例 1 落定）
 
@@ -120,5 +120,5 @@ type LibraryMode struct {
 
 ## 11. 开放点
 
-- **D2**：附件机制 A/B/C 在阶段 3 决策。
 - Gallery NFO 命名约定（`folder.nfo` / 同名 `.nfo`）待定。
+- D2 附件机制已决策为方案 A（见 §3 D2）；B/C 保留为未来扩展。

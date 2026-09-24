@@ -127,7 +127,7 @@ func DateFromYear(year int) Date
 | 路径      | 职责                                                         |
 | --------- | ------------------------------------------------------------ |
 | `nfo/`    | Kodi DTO + `Parse`/`ParseFile`；`mapping`；`applier`（扫描回填） |
-| `cover/`  | 封面策略链：poster → 同名图 → FFmpeg 20%                     |
+| `cover/` / `attachments/` | 封面策略链 + 缩略图；附件 resolver（文件系统直读 fanart/poster/extra） |
 
 ### backend/pkg/logger/
 
@@ -150,7 +150,7 @@ func DateFromYear(year int) Date
 | ------------------ | ------------------------------------------------------------ |
 | `app.go`           | Wails `ServiceStartup`、`ScanLibrary` / `FindScenes`（分页）、`SceneDTO`（含 tags/performers）/`ScenesPageDTO` 定义 |
 | `scene.go`         | `GetScene` / `SceneDetailDTO` / `TagDTO` / `PerformerDTO` / `SceneFileDTO` |
-| `cover.go` / `thumbnail.go` | `ensureCover` + `CoverMiddleware`/`handleCover`；缩略图端点 + 磁盘缓存 |
+| `cover.go` / `thumbnail.go` / `assets.go` / `attachment.go` | 封面/缩略图与附件端点；`AssetMiddleware` 按前缀分发 |
 | `events.go`        | `watchScanEvents`（扫描完成推送 `scan:complete`）             |
 | `taxonomy.go`      | `FindPerformers`/`FindTags`/`FindStudios` + 分类 Page DTO     |
 | `config.go` / `logging.go` / `paths.go` / `wails_emitter.go` | 配置、日志、目录布局、事件/日志推送适配 |
@@ -192,7 +192,7 @@ git diff --name-only HEAD -- backend/manager backend/pkg  # 找冻结区改动
 
 | 日期       | 变更                                                         |
 | ---------- | ------------------------------------------------------------ |
-| 2026-09-24 | 阶段 3.7：`thumbnail.go`（缩略图端点/缓存）；列表海报墙 |
+| 2026-09-24 | 阶段 3.7/3.8：缩略图端点/缓存 + 列表海报墙；附件 resolver（方案 A）+ `/attachments` 端点 |
 | 2026-09-24 | 阶段 3.4-3.6：`Pager.svelte`、router 前缀路由 + `NAV_ITEMS`、`taxonomy.go` + `TaxonomyList.svelte` |
 | 2026-09-24 | 阶段 3.1-3.3：`scan:complete`；`ScenesPageDTO`（分页）；`SceneDTO` 加 tags/performers |
 | 2026-09-23 | 命名清理（阶段 5）：`StashConfig→LibraryConfig`、`stash_config.go→library_config.go`、`stashignore.go→caseignore.go`、`GetStashHomeDirectory→GetCaseHomeDirectory`、`STASH_*`→`CASE_*` |

@@ -7,6 +7,7 @@ export {
 };
 
 export type {
+    AttachmentDTO,
     PerformerDTO,
     PerformersPageDTO,
     SceneDTO,

@@ -63,6 +63,9 @@ type SceneDetailDTO struct {
 	CoverWidth  int    `json:"coverWidth"`
 	CoverHeight int    `json:"coverHeight"`
 
+	// Attachments are filesystem-only extra images (fanart/poster/extra).
+	Attachments []AttachmentDTO `json:"attachments"`
+
 	// Convenience fields for the primary file. Duration/FrameRate are 0 when
 	// unknown; Resolution is empty when dimensions are unknown.
 	Path       string  `json:"path"`
@@ -140,6 +143,7 @@ func (a *App) GetScene(id int) (*SceneDetailDTO, error) {
 		dto.CoverURL, dto.CoverWidth, dto.CoverHeight = a.ensureCover(
 			context.Background(), dto.ID, coverVideoPath, coverWidth, coverDuration,
 		)
+		dto.Attachments = a.resolveAttachments(dto.ID, coverVideoPath)
 	}
 
 	logger.Infof("查询场景详情: id=%d", id)

@@ -1,5 +1,31 @@
 # CHANGELOG
 
+## 2026-09-24（阶段 3.8 - 详情页附件，D2 方案 A）
+
+### 新增
+
+- `backend/pkg/metadata/attachments`：附件 resolver（`fanart/`/`poster/`/`extra/`，文件系统直读，不持久化）+ 3 用例
+- `internal/app/attachment.go`：`AttachmentDTO` + `/attachments/<sceneID>/<index>` handler（按索引定位，防路径穿越）
+- `internal/app/assets.go`：`AssetMiddleware` 按前缀分发（`/covers`、`/attachments`）
+
+### 修改
+
+- `internal/app/cover.go`：移除 `CoverMiddleware`（迁至 `assets.go`），保留 `handleCover`
+- `internal/app/scene.go`：`SceneDetailDTO` 增 `Attachments`；`GetScene` 组装附件 DTO
+- `main.go`：`app.CoverMiddleware` → `app.AssetMiddleware`
+- `frontend/src/lib/components/SceneDetail.svelte`：附件区块（16/9 网格 + 名称）
+
+### 验证
+
+- `go build ./...`、`go vet ./internal/app/...`、`go test ./internal/app/... ./backend/pkg/metadata/attachments/...`：通过
+- bindings 重新生成（新增 `AttachmentDTO`；`/covers`、`/attachments`）
+- `npm run check`：0 errors；`npm run build`：通过；`wails3 dev` 冒烟成功
+
+### 说明
+
+- 附件不入库、不搜索；`Attachments` 开关待 3b `LibraryMode` 接入
+- 技术债：附件无缓存、每次详情枚举目录（见 TECH_DEBT）
+
 ## 2026-09-24（阶段 3.7 - 封面缩略图 + 列表海报墙）
 
 ### 新增
