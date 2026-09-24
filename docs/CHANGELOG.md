@@ -1,5 +1,31 @@
 # CHANGELOG
 
+## 2026-09-24（阶段 3.3 - 列表标签/演员）
+
+### 新增
+
+- `internal/app/app.go`：`SceneDTO` 增加 `Tags []TagDTO` / `Performers []PerformerDTO`；`intSetKeys` 辅助
+
+### 修改
+
+- `internal/app/app.go`：`FindScenes` 在本页场景上 `LoadTagIDs`/`LoadPerformerIDs`，收集关联 ID 后**批量取名称**（`findTags`/`findPerformers`），复用 `toTagDTOs`/`toPerformerDTOs`
+- `frontend/src/lib/components/SceneList.svelte`：卡片增加演员/标签 chips（各最多 3 个 + `+N`）
+- `internal/app/pagination_test.go`：新增 `intSetKeys` 用例
+
+### 修复
+
+- 无
+
+### 验证
+
+- `go build ./...`、`go test ./internal/app/...`：通过
+- bindings 重新生成（`SceneDTO` 含 `tags`/`performers`）
+- `npm run check`：0 errors；`npm run build`：通过；`wails3 dev` 冒烟成功
+
+### 说明
+
+- 关联 ID 仍为「每场景一次查询」（≤50 行）；批量加载优化见 TECH_DEBT（阶段 5 N+1）
+
 ## 2026-09-24（阶段 3.2 - 列表分页）
 
 ### 新增

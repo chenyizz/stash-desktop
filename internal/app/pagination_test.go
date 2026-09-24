@@ -23,3 +23,11 @@ func TestNormalizePage(t *testing.T) {
 		assert.Equal(t, tt.wantPageSize, pageSize)
 	}
 }
+
+func TestIntSetKeys(t *testing.T) {
+	assert.Empty(t, intSetKeys(map[int]struct{}{}))
+
+	got := intSetKeys(map[int]struct{}{1: {}, 2: {}, 3: {}})
+	assert.Len(t, got, 3)
+	assert.ElementsMatch(t, []int{1, 2, 3}, got)
+}

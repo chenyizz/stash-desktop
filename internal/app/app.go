@@ -23,14 +23,16 @@ type App struct {
 }
 
 type SceneDTO struct {
-	ID        int    `json:"id"`
-	Title     string `json:"title"`
-	Path      string `json:"path"`
-	OSHash    string `json:"oshash"`
-	Checksum  string `json:"checksum"`
-	Organized bool   `json:"organized"`
-	CreatedAt string `json:"createdAt"`
-	UpdatedAt string `json:"updatedAt"`
+	ID         int            `json:"id"`
+	Title      string         `json:"title"`
+	Path       string         `json:"path"`
+	OSHash     string         `json:"oshash"`
+	Checksum   string         `json:"checksum"`
+	Organized  bool           `json:"organized"`
+	Tags       []TagDTO       `json:"tags"`
+	Performers []PerformerDTO `json:"performers"`
+	CreatedAt  string         `json:"createdAt"`
+	UpdatedAt  string         `json:"updatedAt"`
 }
 
 // ScenesPageDTO 是场景列表的分页结果。
@@ -54,6 +56,15 @@ func normalizePage(page, pageSize int) (int, int) {
 	}
 
 	return page, pageSize
+}
+
+func intSetKeys(set map[int]struct{}) []int {
+	keys := make([]int, 0, len(set))
+	for k := range set {
+		keys = append(keys, k)
+	}
+
+	return keys
 }
 
 func New() *App {
@@ -223,16 +234,45 @@ func (a *App) FindScenes(page int, pageSize int) (*ScenesPageDTO, error) {
 			return err
 		}
 
+		// 先收集本页关联 ID，再一次性批量取名称（避免逐行查询名称）
+		tagIDSet := make(map[int]struct{})
+		performerIDSet := make(map[int]struct{})
+		for _, s := range scenes {
+			if err := s.LoadTagIDs(ctx, a.mgr.Repository.Scene); err != nil {
+				return fmt.Errorf("加载标签关联失败: %w", err)
+			}
+			if err := s.LoadPerformerIDs(ctx, a.mgr.Repository.Scene); err != nil {
+				return fmt.Errorf("加载演员关联失败: %w", err)
+			}
+			for _, id := range s.TagIDs.List() {
+				tagIDSet[id] = struct{}{}
+			}
+			for _, id := range s.PerformerIDs.List() {
+				performerIDSet[id] = struct{}{}
+			}
+		}
+
+		tags, err := a.findTags(ctx, intSetKeys(tagIDSet))
+		if err != nil {
+			return err
+		}
+		performers, err := a.findPerformers(ctx, intSetKeys(performerIDSet))
+		if err != nil {
+			return err
+		}
+
 		for _, s := range scenes {
 			dtos = append(dtos, SceneDTO{
-				ID:        s.ID,
-				Title:     s.GetTitle(),
-				Path:      s.Path,
-				OSHash:    s.OSHash,
-				Checksum:  s.Checksum,
-				Organized: s.Organized,
-				CreatedAt: s.CreatedAt.Format("2006-01-02 15:04:05"),
-				UpdatedAt: s.UpdatedAt.Format("2006-01-02 15:04:05"),
+				ID:         s.ID,
+				Title:      s.GetTitle(),
+				Path:       s.Path,
+				OSHash:     s.OSHash,
+				Checksum:   s.Checksum,
+				Organized:  s.Organized,
+				Tags:       toTagDTOs(s.TagIDs.List(), tags),
+				Performers: toPerformerDTOs(s.PerformerIDs.List(), performers),
+				CreatedAt:  s.CreatedAt.Format("2006-01-02 15:04:05"),
+				UpdatedAt:  s.UpdatedAt.Format("2006-01-02 15:04:05"),
 			})
 		}
 		return nil

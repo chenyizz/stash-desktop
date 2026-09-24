@@ -132,6 +132,22 @@
             {/if}
             <span class="hash">{scene.oshash}</span>
           </div>
+          {#if (scene.performers?.length ?? 0) > 0 || (scene.tags?.length ?? 0) > 0}
+            <div class="scene-chips">
+              {#each (scene.performers ?? []).slice(0, 3) as performer (performer.id)}
+                <span class="chip performer">{performer.name}</span>
+              {/each}
+              {#if (scene.performers?.length ?? 0) > 3}
+                <span class="chip more">+{scene.performers.length - 3}</span>
+              {/if}
+              {#each (scene.tags ?? []).slice(0, 3) as tag (tag.id)}
+                <span class="chip tag">{tag.name}</span>
+              {/each}
+              {#if (scene.tags?.length ?? 0) > 3}
+                <span class="chip more">+{scene.tags.length - 3}</span>
+              {/if}
+            </div>
+          {/if}
           <div class="scene-path" title={scene.path}>{scene.path}</div>
           <div class="scene-date">{scene.createdAt}</div>
         </div>
@@ -245,6 +261,37 @@
     font-size: 0.85rem;
     color: #555;
     margin-bottom: 0.5rem;
+  }
+  .scene-chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.3rem;
+    margin-bottom: 0.5rem;
+  }
+  .chip {
+    font-size: 0.72rem;
+    padding: 0.05rem 0.45rem;
+    border-radius: 999px;
+    background: #eef1f4;
+    border: 1px solid #dde3e8;
+    color: #333;
+    max-width: 9rem;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  .chip.performer {
+    background: #e8f0fe;
+    border-color: #d2e3fc;
+  }
+  .chip.tag {
+    background: #eef7ee;
+    border-color: #d7ecd7;
+  }
+  .chip.more {
+    background: transparent;
+    border-color: transparent;
+    color: #888;
   }
   .scene-path {
     font-size: 0.75rem;

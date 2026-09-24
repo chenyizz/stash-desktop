@@ -24,6 +24,7 @@
 - 封面图：`backend/pkg/metadata/cover/` 策略链（poster → 同名图 → FFmpeg 20%）+ `/covers/<id>` 中间件 + 详情页展示/占位
 - 扫描完成事件：后端 `scan:complete`（`internal/app/events.go`）+ 前端监听，替代 `setTimeout`
 - 列表分页：`FindScenes` 返回 `ScenesPageDTO`（`total/page/pageSize`）+ 前端分页器
+- 列表标签/演员：`SceneDTO` 扩展结构化 `tags/performers`（本页批量取名称）+ 前端 chips
 
 ## 当前焦点
 
@@ -31,14 +32,12 @@
 
 ## 下一步
 
-1. 列表标签 / 演员展示
-2. 封面缩略图与列表海报墙
-3. 阶段 3 结束前写 `docs/MIGRATIONS.md`（记录当前 schema、每张表作用、停用表、删除顺序）
+1. 封面缩略图与列表海报墙
+2. 阶段 3 结束前写 `docs/MIGRATIONS.md`（记录当前 schema、每张表作用、停用表、删除顺序）
 
 ## 已知问题（阶段 3 相关）
 
 - 无虚拟滚动
-- 列表看不到标签/演员
 - 同场景多文件首次扫描时标量字段由并行顺序决定（阶段 3+ 再设计优先级）
 - 取消扫描时后端不发 `scan:complete`，前端需手动刷新（用刷新按钮兜底）
 
@@ -46,6 +45,7 @@
 
 ## 最近变更
 
+- 列表标签/演员：`SceneDTO` 增加 `tags`/`performers`（结构化 ID+Name）；本页关联 ID 收集后批量取名称
 - 列表分页：`FindScenes` 返回 `ScenesPageDTO`（`total`）+ 前端上一页/下一页分页器
 - 扫描完成事件：`internal/app/events.go`（watcher + 契约 `scan:complete` + `{at}`）替代前端 `setTimeout`
 - 封面收尾：`CoverURL` 缓存参数改用 `md5(bytes)[:8]`（`UpdateCover` 不改 `updated_at`）；解码失败置空走占位

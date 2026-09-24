@@ -16,6 +16,8 @@ export interface SceneDTO {
     "oshash": string;
     "checksum": string;
     "organized": boolean;
+    "tags": TagDTO[] | null;
+    "performers": PerformerDTO[] | null;
     "createdAt": string;
     "updatedAt": string;
 }
