@@ -124,6 +124,7 @@ func (a *App) ServiceStartup(ctx context.Context, options application.ServiceOpt
 	watchCtx, cancel := context.WithCancel(context.Background())
 	a.cancel = cancel
 	go watchScanEvents(watchCtx, mgr, (&wailsEmitter{app: a.app}).Emit)
+	go a.SweepThumbnails(watchCtx)
 
 	return nil
 }

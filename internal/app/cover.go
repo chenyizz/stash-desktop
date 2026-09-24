@@ -93,9 +93,8 @@ func (a *App) screenshotFunc(videoPath string, width int, duration float64) cove
 	}
 }
 
-// CoverMiddleware serves scene covers at /covers/<sceneID>. It is a package
-// function rather than an App method so that Wails does not bind it as a
-// frontend-callable service method.
+// CoverMiddleware 仅按前缀分发到封面 handler（保持中间件无业务分支）。
+// 它是包级函数而非 App 方法，避免被 Wails 绑定为前端可调方法。
 func CoverMiddleware(a *App) application.Middleware {
 	return func(next http.Handler) http.Handler {
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
@@ -104,24 +103,39 @@ func CoverMiddleware(a *App) application.Middleware {
 				return
 			}
 
-			if a.mgr == nil {
-				http.NotFound(w, r)
-				return
-			}
-
-			sceneID, err := strconv.Atoi(strings.TrimPrefix(r.URL.Path, coverURLPrefix))
-			if err != nil || sceneID <= 0 {
-				http.NotFound(w, r)
-				return
-			}
-
-			data, err := a.readCover(r.Context(), sceneID)
-			if err != nil || len(data) == 0 {
-				http.NotFound(w, r)
-				return
-			}
-
-			utils.ServeImage(w, r, data)
+			a.handleCover(w, r)
 		})
 	}
+}
+
+// handleCover 处理 /covers/<sceneID>：带 ?w= 时返回缩略图，否则返回原图。
+func (a *App) handleCover(w http.ResponseWriter, r *http.Request) {
+	if a.mgr == nil {
+		http.NotFound(w, r)
+		return
+	}
+
+	sceneID, err := strconv.Atoi(strings.TrimPrefix(r.URL.Path, coverURLPrefix))
+	if err != nil || sceneID <= 0 {
+		http.NotFound(w, r)
+		return
+	}
+
+	if widthStr := r.URL.Query().Get("w"); widthStr != "" {
+		width, convErr := strconv.Atoi(widthStr)
+		if convErr != nil {
+			http.NotFound(w, r)
+			return
+		}
+		a.serveThumbnail(w, r, sceneID, width)
+		return
+	}
+
+	data, err := a.readCover(r.Context(), sceneID)
+	if err != nil || len(data) == 0 {
+		http.NotFound(w, r)
+		return
+	}
+
+	utils.ServeImage(w, r, data)
 }
