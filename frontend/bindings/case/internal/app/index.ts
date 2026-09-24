@@ -6,7 +6,7 @@ export {
     App
 };
 
-export type {
+export {
     AttachmentDTO,
     PerformerDTO,
     PerformersPageDTO,
@@ -14,6 +14,7 @@ export type {
     SceneDTO,
     SceneDetailDTO,
     SceneFileDTO,
+    ScenesFilter,
     ScenesPageDTO,
     ScenesQuery,
     StudioDTO,

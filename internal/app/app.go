@@ -210,10 +210,15 @@ func (a *App) FindScenes(input ScenesQuery) (*ScenesPageDTO, error) {
 
 	query, page, pageSize := normalizeListQuery(input.Query, input.Page, input.PageSize)
 
+	sceneFilter, err := buildSceneFilter(input.Filter)
+	if err != nil {
+		return nil, fmt.Errorf("过滤条件无效: %w", err)
+	}
+
 	var dtos []SceneDTO
 	total := 0
 
-	err := a.mgr.Repository.WithReadTxn(context.Background(), func(ctx context.Context) error {
+	err = a.mgr.Repository.WithReadTxn(context.Background(), func(ctx context.Context) error {
 		findFilter := &models.FindFilterType{
 			Page:    &page,
 			PerPage: &pageSize,
@@ -225,6 +230,7 @@ func (a *App) FindScenes(input ScenesQuery) (*ScenesPageDTO, error) {
 				FindFilter: findFilter,
 				Count:      true,
 			},
+			SceneFilter: sceneFilter,
 		})
 		if err != nil {
 			return err

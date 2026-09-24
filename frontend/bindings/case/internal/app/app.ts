@@ -3,7 +3,7 @@
 
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore: Unused imports
-import { Call as $Call, CancellablePromise as $CancellablePromise } from "@wailsio/runtime";
+import { Call as $Call, CancellablePromise as $CancellablePromise, Create as $Create } from "@wailsio/runtime";
 
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore: Unused imports
@@ -17,28 +17,36 @@ import * as $models from "./models.js";
  * FindPerformers 分页查询演员列表。
  */
 export function FindPerformers(input: $models.PerformersQuery): $CancellablePromise<$models.PerformersPageDTO | null> {
-    return $Call.ByID(2212267212, input);
+    return $Call.ByID(2212267212, input).then(($result: any) => {
+        return $$createType1($result);
+    });
 }
 
 /**
  * FindScenes 分页查询场景列表，返回分页结果与总数。
  */
 export function FindScenes(input: $models.ScenesQuery): $CancellablePromise<$models.ScenesPageDTO | null> {
-    return $Call.ByID(3579858290, input);
+    return $Call.ByID(3579858290, input).then(($result: any) => {
+        return $$createType3($result);
+    });
 }
 
 /**
  * FindStudios 分页查询工作室列表。
  */
 export function FindStudios(input: $models.StudiosQuery): $CancellablePromise<$models.StudiosPageDTO | null> {
-    return $Call.ByID(2077282170, input);
+    return $Call.ByID(2077282170, input).then(($result: any) => {
+        return $$createType5($result);
+    });
 }
 
 /**
  * FindTags 分页查询标签列表。
  */
 export function FindTags(input: $models.TagsQuery): $CancellablePromise<$models.TagsPageDTO | null> {
-    return $Call.ByID(3917363242, input);
+    return $Call.ByID(3917363242, input).then(($result: any) => {
+        return $$createType7($result);
+    });
 }
 
 /**
@@ -52,14 +60,18 @@ export function GetDataDir(): $CancellablePromise<string> {
  * GetScene returns the full detail DTO for a single scene.
  */
 export function GetScene(id: number): $CancellablePromise<$models.SceneDetailDTO | null> {
-    return $Call.ByID(3442445960, id);
+    return $Call.ByID(3442445960, id).then(($result: any) => {
+        return $$createType9($result);
+    });
 }
 
 /**
  * GetSystemStatus 简单状态查询（验证 Manager 是否活着）
  */
-export function GetSystemStatus(): $CancellablePromise<{ [_ in string]?: any } | null> {
-    return $Call.ByID(2642847171);
+export function GetSystemStatus(): $CancellablePromise<{ [_ in string]?: any }> {
+    return $Call.ByID(2642847171).then(($result: any) => {
+        return $$createType10($result);
+    });
 }
 
 /**
@@ -86,3 +98,16 @@ export function ScanLibrary(path: string): $CancellablePromise<number> {
 export function SetApplication(wailsApp: application$0.App | null): $CancellablePromise<void> {
     return $Call.ByID(151671058, wailsApp);
 }
+
+// Private type creation functions
+const $$createType0 = $models.PerformersPageDTO.createFrom;
+const $$createType1 = $Create.Nullable($$createType0);
+const $$createType2 = $models.ScenesPageDTO.createFrom;
+const $$createType3 = $Create.Nullable($$createType2);
+const $$createType4 = $models.StudiosPageDTO.createFrom;
+const $$createType5 = $Create.Nullable($$createType4);
+const $$createType6 = $models.TagsPageDTO.createFrom;
+const $$createType7 = $Create.Nullable($$createType6);
+const $$createType8 = $models.SceneDetailDTO.createFrom;
+const $$createType9 = $Create.Nullable($$createType8);
+const $$createType10 = $Create.Map($Create.Any, $Create.Any);
