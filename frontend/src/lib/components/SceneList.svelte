@@ -6,6 +6,8 @@
   import { SCAN_COMPLETE } from "../events";
   import Pager from "../Pager.svelte";
   import SearchBox from "./SearchBox.svelte";
+  import FilterBar from "./FilterBar.svelte";
+  import type { ScenesFilter } from "../../../bindings/case/internal/app/models";
 
   let scanPath = $state("");
   let scanResult = $state("");
@@ -17,6 +19,7 @@
   let page = $state(1);
   let total = $state(0);
   let query = $state("");
+  let filter = $state<ScenesFilter | null>(null);
   let requestId = 0;
 
   const PAGE_SIZE = 50;
@@ -38,12 +41,17 @@
     }
   }
 
-  async function loadScenes(target = page, q = query) {
+  async function loadScenes(target = page, q = query, f = filter) {
     const req = ++requestId;
     scenesLoading = true;
     scenesError = "";
     try {
-      const result = await App.FindScenes({ query: q, page: target, pageSize: PAGE_SIZE });
+      const result = await App.FindScenes({
+        query: q,
+        page: target,
+        pageSize: PAGE_SIZE,
+        filter: f ?? undefined,
+      });
       if (req !== requestId) return;
       scenes = result?.scenes ?? [];
       total = result?.total ?? 0;
@@ -58,7 +66,12 @@
 
   function onSearch(q: string) {
     query = q;
-    loadScenes(1, q);
+    loadScenes(1, q, filter);
+  }
+
+  function onFilter(f: ScenesFilter) {
+    filter = f;
+    loadScenes(1, query, f);
   }
 
   let totalPages = $derived(Math.max(1, Math.ceil(total / PAGE_SIZE)));
@@ -66,7 +79,7 @@
   function gotoPage(target: number) {
     const next = Math.min(Math.max(1, target), totalPages);
     if (next !== page) {
-      loadScenes(next, query);
+      loadScenes(next, query, filter);
     }
   }
 
@@ -82,7 +95,7 @@
     offScan = Events.On(SCAN_COMPLETE, () => {
       scanning = false;
       scanResult = "✅ 扫描完成，已刷新列表";
-      loadScenes(1, query);
+      loadScenes(1, query, filter);
     });
   });
 
@@ -118,7 +131,8 @@
           placeholder="搜索标题 / 简介 / 标签 / 演员 / 工作室"
           onchange={onSearch}
         />
-        <button onclick={() => loadScenes(page, query)} disabled={scenesLoading}>
+        <FilterBar onapply={onFilter} />
+        <button onclick={() => loadScenes(page, query, filter)} disabled={scenesLoading}>
           {scenesLoading ? "加载中..." : "刷新"}
         </button>
       </div>
