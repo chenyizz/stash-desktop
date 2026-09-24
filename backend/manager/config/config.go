@@ -1961,6 +1961,16 @@ func (i *Config) Validate() error {
 		}
 	}
 
+	// 校验库路径的扫描模式：显式同时关闭视频与图片是无效配置
+	var libs LibraryConfigs
+	if err := i.forKey(Libraries).Unmarshal(Libraries, &libs); err == nil {
+		for _, lib := range libs {
+			if lib.Mode != nil && !lib.Mode.Videos && !lib.Mode.Images {
+				return fmt.Errorf("library %q: 至少启用一种媒体类型（videos 或 images）", lib.Path)
+			}
+		}
+	}
+
 	return nil
 }
 
