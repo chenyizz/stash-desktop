@@ -1055,10 +1055,39 @@ func (qb *SceneStore) makeQuery(ctx context.Context, sceneFilter *models.SceneFi
 				table:    sceneMarkerTable,
 				onClause: "scene_markers.scene_id = scenes.id",
 			},
+			join{
+				table:    scenesTagsTable,
+				onClause: "scenes_tags.scene_id = scenes.id",
+			},
+			join{
+				table:    tagTable,
+				onClause: "scenes_tags.tag_id = tags.id",
+			},
+			join{
+				table:    performersScenesTable,
+				onClause: "performers_scenes.scene_id = scenes.id",
+			},
+			join{
+				table:    performerTable,
+				onClause: "performers_scenes.performer_id = performers.id",
+			},
+			join{
+				table:    studioTable,
+				onClause: "scenes.studio_id = studios.id",
+			},
 		)
 
 		filepathColumn := "folders.path || '" + string(filepath.Separator) + "' || files.basename"
-		searchColumns := []string{"scenes.title", "scenes.details", filepathColumn, "files_fingerprints.fingerprint", "scene_markers.title"}
+		searchColumns := []string{
+			"scenes.title",
+			"scenes.details",
+			filepathColumn,
+			"files_fingerprints.fingerprint",
+			"scene_markers.title",
+			"tags.name",
+			"performers.name",
+			"studios.name",
+		}
 		query.parseQueryString(searchColumns, *q)
 	}
 
