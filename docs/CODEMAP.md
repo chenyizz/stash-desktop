@@ -148,7 +148,7 @@ func DateFromYear(year int) Date
 
 | 文件               | 职责                                                         |
 | ------------------ | ------------------------------------------------------------ |
-| `app.go` / `query.go` | Wails `ServiceStartup`、`ScanLibrary` / `FindScenes`（分页+搜索）、`SceneDTO`/`ScenesQuery` 等 |
+| `app.go` / `query.go` / `filter.go` | Wails 方法；查询/过滤入参（`ScenesQuery`/`ScenesFilter`）与 `buildSceneFilter` |
 | `scene.go`         | `GetScene` / `SceneDetailDTO` / `TagDTO` / `PerformerDTO` / `SceneFileDTO` |
 | `cover.go` / `thumbnail.go` / `assets.go` / `attachment.go` | 封面/缩略图与附件端点；`AssetMiddleware` 按前缀分发 |
 | `events.go`        | `watchScanEvents`（扫描完成推送 `scan:complete`）             |
@@ -162,7 +162,7 @@ func DateFromYear(year int) Date
 | 路径                      | 职责                                              |
 | ------------------------- | ------------------------------------------------- |
 | `App.svelte` / `main.ts`  | 路由 shell（列表 ↔ 详情）与入口挂载              |
-| `lib/`                    | `router.svelte.ts`（hash 路由）、`Pager.svelte`、`components/`（SceneList/SceneDetail/TaxonomyList/SearchBox）、`format.ts`、`external.ts`、`events.ts` |
+| `lib/`                    | `router.svelte.ts`（hash 路由）、`Pager.svelte`、`components/`（SceneList/SceneDetail/TaxonomyList/SearchBox/FilterBar/EntityPicker）、`format.ts`、`external.ts`、`events.ts` |
 
 ---
 
@@ -192,7 +192,7 @@ git diff --name-only HEAD -- backend/manager backend/pkg  # 找冻结区改动
 
 | 日期       | 变更                                                         |
 | ---------- | ------------------------------------------------------------ |
-| 2026-09-24 | 阶段 3.7-3.10：缩略图/海报墙；附件；`LibraryMode`；搜索（查询结构体 + `SearchBox`） |
+| 2026-09-24 | 阶段 3.7-3.11：缩略图/海报墙；附件；`LibraryMode`；搜索；过滤（`FilterBar`/`EntityPicker`） |
 | 2026-09-24 | 阶段 3.4-3.6：`Pager.svelte`、router 前缀路由 + `NAV_ITEMS`、`taxonomy.go` + `TaxonomyList.svelte` |
 | 2026-09-24 | 阶段 3.1-3.3：`scan:complete`；`ScenesPageDTO`（分页）；`SceneDTO` 加 tags/performers |
 | 2026-09-23 | 命名清理（阶段 5）：`StashConfig→LibraryConfig`、`stash_config.go→library_config.go`、`stashignore.go→caseignore.go`、`GetStashHomeDirectory→GetCaseHomeDirectory`、`STASH_*`→`CASE_*` |

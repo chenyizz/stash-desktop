@@ -30,6 +30,7 @@
 - 详情页附件（D2 方案 A）：`backend/pkg/metadata/attachments` + `/attachments/<sceneID>/<index>` + 详情页附件区块（不入库）
 - 库路径扫描模式 `LibraryMode`（`Videos/Images/Attachments`，默认全开）：扫描分派与附件开关接入
 - 搜索：查询结构体入参（过滤只加字段）；IME 组合态 + 300ms 防抖 `SearchBox`；场景搜索覆盖 tag/演员/工作室
+- 过滤：`ScenesQuery.Filter`（已整理/评分/日期/tag/演员/工作室）+ `FilterBar`/`EntityPicker`（显式应用）
 
 ## 当前焦点
 
@@ -37,7 +38,8 @@
 
 ## 下一步
 
-1. 阶段 3 结束前写 `docs/MIGRATIONS.md`（记录当前 schema、每张表作用、停用表、删除顺序）
+1. 虚拟滚动
+2. 阶段 3 结束前写 `docs/MIGRATIONS.md`（记录当前 schema、每张表作用、停用表、删除顺序）
 
 ## 已知问题（阶段 3 相关）
 
@@ -49,8 +51,8 @@
 
 ## 最近变更
 
+- 过滤：`internal/app/filter.go` + `FilterBar`/`EntityPicker`（已整理/评分/日期/tag/演员/工作室，显式应用）
 - 搜索：`ScenesQuery` 等结构体入参 + `normalizeQuery`（rune 上限）；`SearchBox.svelte`（IME+防抖）接入两个列表；场景搜索覆盖 tag/演员/工作室
-- 库路径 `LibraryMode`：config 结构/默认/校验 + `useAs*`/`scanFilter`/附件按 mode 分派
 - 列表分页 + 标签/演员：`FindScenes` 返回 `ScenesPageDTO`；`SceneDTO` 含 `tags`/`performers`（本页批量取名称）
 - 扫描完成事件：`internal/app/events.go`（watcher + 契约 `scan:complete` + `{at}`）替代前端 `setTimeout`
 - 封面收尾：`CoverURL` 缓存参数改用 `md5(bytes)[:8]`（`UpdateCover` 不改 `updated_at`）；解码失败置空走占位

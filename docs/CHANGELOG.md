@@ -1,5 +1,28 @@
 # CHANGELOG
 
+## 2026-09-24（阶段 3.11 - 过滤）
+
+### 新增
+
+- `internal/app/filter.go`：`buildSceneFilter` 把 `ScenesFilter` 映射为 `models.SceneFilterType`（已整理/评分区间/日期区间/tag/演员/工作室，含 `IncludeSub*` → Depth=-1），非法值返回 error；`filter_test.go` 用例
+- `frontend/src/lib/components/FilterBar.svelte`：过滤面板（已整理/最低评分/日期范围 + 实体多选 + 任一/全部、含子项开关），显式「应用/重置」
+- `frontend/src/lib/components/EntityPicker.svelte`：可复用多选弹层（复用 `SearchBox` 防抖搜索 + 已选 chips）
+
+### 修改
+
+- `internal/app/query.go`：`ScenesQuery` 增 `Filter *ScenesFilter`；`FindScenes` 组合 `Q` 与 `SceneFilter`
+- `SceneList.svelte`：持有过滤状态并传入查询；应用过滤后回第 1 页
+- bindings 重新生成（新增 `ScenesFilter` 模型）
+
+### 验证
+
+- `go build ./...`、`go test ./internal/app/...`（含过滤映射用例）：通过
+- `npm run check`：0 errors；`npm run build`：通过；`wails3 dev` 冒烟成功
+
+### 说明
+
+- 过滤不持久化；维度暂为已整理/评分/日期/tag/演员/工作室。其余（分辨率/编码/时长/收藏/marker/is_missing）按需再补
+
 ## 2026-09-24（阶段 3.10 - 搜索）
 
 ### 新增
