@@ -1,12 +1,13 @@
 # 代码地图
 
-## 最后更新：2026-09-23（复核实际文件清单）
+## 最后更新：2026-09-24
 
 ## 维护规则
 
 - 新增、删除、重命名模块或关键文件时，Agent **必须**更新本文件。
 - 只放**定位信息**：路径、职责、关键类型摘要、搜索命令。
-- 不放实现细节、完整代码和易变行号；控制在 200 行以内，超出时下沉到 `docs/CONVENTIONS.md` / `docs/ARCHITECTURE.md`。
+- 不放实现细节、完整代码和易变行号。
+- 控制在 300 行以内；超出下沉到 `docs/ARCHITECTURE.md`。
 
 ---
 
@@ -192,9 +193,17 @@ git diff --name-only HEAD -- backend/manager backend/pkg  # 找冻结区改动
 
 | 日期       | 变更                                                         |
 | ---------- | ------------------------------------------------------------ |
-| 2026-09-24 | 阶段 3.7-3.11：缩略图/海报墙；附件；`LibraryMode`；搜索；过滤（`FilterBar`/`EntityPicker`） |
-| 2026-09-24 | 阶段 3.4-3.6：`Pager.svelte`、router 前缀路由 + `NAV_ITEMS`、`taxonomy.go` + `TaxonomyList.svelte` |
-| 2026-09-24 | 阶段 3.1-3.3：`scan:complete`；`ScenesPageDTO`（分页）；`SceneDTO` 加 tags/performers |
+| 2026-09-24 | 阶段 3.11：过滤（`filter.go` + `FilterBar`/`EntityPicker`） |
+| 2026-09-24 | 阶段 3.10：搜索（查询结构体 + `SearchBox`；场景搜索覆盖 tag/演员/工作室） |
+| 2026-09-24 | 阶段 3.9：`LibraryMode` 结构/默认/校验 + 扫描分派 |
+| 2026-09-24 | 阶段 3.8：详情页附件（方案 A）；`AssetMiddleware` 前缀分发 |
+| 2026-09-24 | 阶段 3.7：缩略图端点/缓存 + 列表海报墙 |
+| 2026-09-24 | 阶段 3.6：`taxonomy.go` + `TaxonomyList.svelte` + 顶部导航 |
+| 2026-09-24 | 阶段 3.5：router 前缀路由 + `NAV_ITEMS` |
+| 2026-09-24 | 阶段 3.4：抽出 `Pager.svelte` |
+| 2026-09-24 | 阶段 3.3：`SceneDTO` 加 tags/performers |
+| 2026-09-24 | 阶段 3.2：`ScenesPageDTO`（分页） |
+| 2026-09-24 | 阶段 3.1：`scan:complete` 事件替代 `setTimeout` |
 | 2026-09-23 | 命名清理（阶段 5）：`StashConfig→LibraryConfig`、`stash_config.go→library_config.go`、`stashignore.go→caseignore.go`、`GetStashHomeDirectory→GetCaseHomeDirectory`、`STASH_*`→`CASE_*` |
 | 2026-09-23 | 阶段 2.4：NFO applier 接入；详情页 + hash 路由；`metadata/cover/` + `internal/app/cover.go` |
 | 2026-09-23 | 复核实际文件并创建：修正 models 类型摘要，补 `ffmpeg`/`manager/config`/`scene`/`metadata` 模块 |

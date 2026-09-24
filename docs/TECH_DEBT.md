@@ -49,6 +49,11 @@
 - 无分页、无虚拟滚动：列表数据量大时卡，阶段 3 补。
 - 扫描完成用 `setTimeout` 等，不可靠，阶段 3 改为事件通知。
 
+## 展示策略（前端不暴露）
+
+- Performer 隐藏字段（DTO/UI 不暴露，DB 保留，阶段 7 再决定删否）：`Ethnicity`、`HairColor`、`EyeColor`、`PenisLength`、`Circumcised`、`FakeTits`、`Piercings`、`StashIDs`。
+- `StashIDs` 模块：内部领域术语保留（ADR-009），前端 DTO/UI 一律不暴露。
+
 ## 一致性 / 命名
 
 - `JavbusID` 字段名与内容不匹配（存的是 URL）。
