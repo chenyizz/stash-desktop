@@ -152,8 +152,8 @@ func DateFromYear(year int) Date
 | `scene.go`         | `GetScene` / `SceneDetailDTO` / `TagDTO` / `PerformerDTO` / `SceneFileDTO` |
 | `cover.go`         | `ensureCover`（按需生成）+ `CoverMiddleware`（`/covers/<id>`） |
 | `events.go`        | `watchScanEvents`（扫描完成推送 `scan:complete`）             |
-| `config.go` / `logging.go` | 配置初始化、日志初始化与 UI Handler                  |
-| `paths.go` / `wails_emitter.go` | 数据目录布局、事件/日志推送适配             |
+| `taxonomy.go`      | `FindPerformers`/`FindTags`/`FindStudios` + 分类 Page DTO     |
+| `config.go` / `logging.go` / `paths.go` / `wails_emitter.go` | 配置、日志、目录布局、事件/日志推送适配 |
 
 **规则**：只做胶水，不写业务逻辑。导出方法首字母大写才会暴露给前端。
 
@@ -192,6 +192,7 @@ git diff --name-only HEAD -- backend/manager backend/pkg  # 找冻结区改动
 
 | 日期       | 变更                                                         |
 | ---------- | ------------------------------------------------------------ |
+| 2026-09-24 | 阶段 3.4-3.6：`Pager.svelte`、router 前缀路由 + `NAV_ITEMS`、`taxonomy.go` + `TaxonomyList.svelte` |
 | 2026-09-24 | 阶段 3.3：`SceneDTO` 增加 `tags`/`performers`（本页批量取名称） |
 | 2026-09-24 | 阶段 3.1/3.2：`scan:complete` 事件；`FindScenes` 返回 `ScenesPageDTO`（分页） |
 | 2026-09-23 | 命名清理（阶段 5）：`StashConfig→LibraryConfig`、`stash_config.go→library_config.go`、`stashignore.go→caseignore.go`、`GetStashHomeDirectory→GetCaseHomeDirectory`、`STASH_*`→`CASE_*` |

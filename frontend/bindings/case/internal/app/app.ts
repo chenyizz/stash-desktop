@@ -14,10 +14,31 @@ import * as application$0 from "../../../github.com/wailsapp/wails/v3/pkg/applic
 import * as $models from "./models.js";
 
 /**
+ * FindPerformers 分页查询演员列表。
+ */
+export function FindPerformers(page: number, pageSize: number): $CancellablePromise<$models.PerformersPageDTO | null> {
+    return $Call.ByID(2212267212, page, pageSize);
+}
+
+/**
  * FindScenes 分页查询场景列表，返回分页结果与总数。
  */
 export function FindScenes(page: number, pageSize: number): $CancellablePromise<$models.ScenesPageDTO | null> {
     return $Call.ByID(3579858290, page, pageSize);
+}
+
+/**
+ * FindStudios 分页查询工作室列表。
+ */
+export function FindStudios(page: number, pageSize: number): $CancellablePromise<$models.StudiosPageDTO | null> {
+    return $Call.ByID(2077282170, page, pageSize);
+}
+
+/**
+ * FindTags 分页查询标签列表。
+ */
+export function FindTags(page: number, pageSize: number): $CancellablePromise<$models.TagsPageDTO | null> {
+    return $Call.ByID(3917363242, page, pageSize);
 }
 
 /**

@@ -8,9 +8,13 @@ export {
 
 export type {
     PerformerDTO,
+    PerformersPageDTO,
     SceneDTO,
     SceneDetailDTO,
     SceneFileDTO,
     ScenesPageDTO,
-    TagDTO
+    StudioDTO,
+    StudiosPageDTO,
+    TagDTO,
+    TagsPageDTO
 } from "./models.js";

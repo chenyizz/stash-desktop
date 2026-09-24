@@ -1,5 +1,25 @@
 # CHANGELOG
 
+## 2026-09-24（阶段 3.6 - 演员/标签/工作室列表页）
+
+### 新增
+
+- `internal/app/taxonomy.go`：`StudioDTO` + `PerformersPageDTO`/`TagsPageDTO`/`StudiosPageDTO`；`FindPerformers`/`FindTags`/`FindStudios`（单次带 count 查询，复用 `normalizePage`）
+- `frontend/src/lib/components/TaxonomyList.svelte`：通用分类列表（响应式网格 `minmax(160px,1fr)`，`PAGE_SIZE=60`，占位头像）
+
+### 修改
+
+- `frontend/src/App.svelte`：接入 `FindPerformers`/`FindTags`/`FindStudios`，`{#key}` 按路由重挂载
+
+### 验证
+
+- `go build ./...`：通过；bindings 重新生成（11 Methods）
+- `npm run check`：0 errors；`npm run build`：通过；`wails3 dev` 冒烟成功
+
+### 说明
+
+- 分类卡片暂不可点击（详情页留待后续子步骤），不使用 `<a href>`/`cursor:pointer`，避免死链
+
 ## 2026-09-24（阶段 3.5 - 前端重构：泛化路由 + 导航）
 
 ### 修改

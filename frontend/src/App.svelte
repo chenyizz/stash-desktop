@@ -2,7 +2,39 @@
   import { onMount } from "svelte";
   import SceneList from "./lib/components/SceneList.svelte";
   import SceneDetail from "./lib/components/SceneDetail.svelte";
+  import TaxonomyList from "./lib/components/TaxonomyList.svelte";
+  import { App } from "../bindings/case/internal/app";
   import { initRouter, isActive, NAV_ITEMS, route } from "./lib/router.svelte";
+
+  type Item = { id: number; name: string };
+  type PageResult = { items: Item[]; total: number; page: number };
+
+  async function loadPerformers(page: number, pageSize: number): Promise<PageResult> {
+    const r = await App.FindPerformers(page, pageSize);
+    return {
+      items: (r?.performers ?? []).map((p) => ({ id: p.id, name: p.name })),
+      total: r?.total ?? 0,
+      page: r?.page ?? page,
+    };
+  }
+
+  async function loadTags(page: number, pageSize: number): Promise<PageResult> {
+    const r = await App.FindTags(page, pageSize);
+    return {
+      items: (r?.tags ?? []).map((t) => ({ id: t.id, name: t.name })),
+      total: r?.total ?? 0,
+      page: r?.page ?? page,
+    };
+  }
+
+  async function loadStudios(page: number, pageSize: number): Promise<PageResult> {
+    const r = await App.FindStudios(page, pageSize);
+    return {
+      items: (r?.studios ?? []).map((s) => ({ id: s.id, name: s.name })),
+      total: r?.total ?? 0,
+      page: r?.page ?? page,
+    };
+  }
 
   onMount(() => initRouter());
 </script>
@@ -15,10 +47,18 @@
 
 {#if route.name === "scene"}
   <SceneDetail id={route.id} />
-{:else if route.name === "performers" || route.name === "tags" || route.name === "studios"}
-  <main class="placeholder">
-    <p>{route.name} 开发中...</p>
-  </main>
+{:else if route.name === "performers"}
+  {#key "performers"}
+    <TaxonomyList title="演员" load={loadPerformers} />
+  {/key}
+{:else if route.name === "tags"}
+  {#key "tags"}
+    <TaxonomyList title="标签" load={loadTags} />
+  {/key}
+{:else if route.name === "studios"}
+  {#key "studios"}
+    <TaxonomyList title="工作室" load={loadStudios} />
+  {/key}
 {:else}
   <SceneList />
 {/if}
@@ -41,10 +81,5 @@
     color: #202b33;
     font-weight: 600;
     background: #eef1f4;
-  }
-  .placeholder {
-    padding: 2rem;
-    font-family: system-ui, sans-serif;
-    color: #888;
   }
 </style>

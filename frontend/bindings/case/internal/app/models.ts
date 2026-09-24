@@ -9,6 +9,13 @@ export interface PerformerDTO {
     "name": string;
 }
 
+export interface PerformersPageDTO {
+    "performers": PerformerDTO[] | null;
+    "total": number;
+    "page": number;
+    "pageSize": number;
+}
+
 export interface SceneDTO {
     "id": number;
     "title": string;
@@ -100,10 +107,32 @@ export interface ScenesPageDTO {
 }
 
 /**
+ * StudioDTO 是工作室的列表项。
+ */
+export interface StudioDTO {
+    "id": number;
+    "name": string;
+}
+
+export interface StudiosPageDTO {
+    "studios": StudioDTO[] | null;
+    "total": number;
+    "page": number;
+    "pageSize": number;
+}
+
+/**
  * TagDTO pairs a tag ID with its name so the frontend can look up either
  * without relying on parallel arrays.
  */
 export interface TagDTO {
     "id": number;
     "name": string;
+}
+
+export interface TagsPageDTO {
+    "tags": TagDTO[] | null;
+    "total": number;
+    "page": number;
+    "pageSize": number;
 }

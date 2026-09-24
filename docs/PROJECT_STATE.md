@@ -25,6 +25,7 @@
 - 扫描完成事件：后端 `scan:complete`（`internal/app/events.go`）+ 前端监听，替代 `setTimeout`
 - 列表分页：`FindScenes` 返回 `ScenesPageDTO`（`total/page/pageSize`）+ 前端分页器
 - 列表标签/演员：`SceneDTO` 扩展结构化 `tags/performers`（本页批量取名称）+ 前端 chips
+- 演员/标签/工作室列表页：`FindPerformers` / `FindTags` / `FindStudios`（分页）+ 通用 `TaxonomyList` + 顶部导航
 
 ## 当前焦点
 
@@ -45,8 +46,9 @@
 
 ## 最近变更
 
-- 列表标签/演员：`SceneDTO` 增加 `tags`/`performers`（结构化 ID+Name）；本页关联 ID 收集后批量取名称
-- 列表分页：`FindScenes` 返回 `ScenesPageDTO`（`total`）+ 前端上一页/下一页分页器
+- 演员/标签/工作室列表页：`internal/app/taxonomy.go` + `TaxonomyList.svelte`（响应式网格，60/页）+ 导航由 router 导出
+- 前端重构：抽出 `Pager.svelte`；router 泛化为前缀路由并导出 `NAV_ITEMS`
+- 列表分页 + 标签/演员：`FindScenes` 返回 `ScenesPageDTO`；`SceneDTO` 含 `tags`/`performers`（本页批量取名称）
 - 扫描完成事件：`internal/app/events.go`（watcher + 契约 `scan:complete` + `{at}`）替代前端 `setTimeout`
 - 封面收尾：`CoverURL` 缓存参数改用 `md5(bytes)[:8]`（`UpdateCover` 不改 `updated_at`）；解码失败置空走占位
 - 新增封面：blob 存储 + 策略链解析 + `/covers/<id>` 中间件 + 详情页封面/占位 + DTO 三个封面字段
