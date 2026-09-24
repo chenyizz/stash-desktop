@@ -14,9 +14,9 @@ import * as application$0 from "../../../github.com/wailsapp/wails/v3/pkg/applic
 import * as $models from "./models.js";
 
 /**
- * FindScenes 分页查询场景列表。
+ * FindScenes 分页查询场景列表，返回分页结果与总数。
  */
-export function FindScenes(page: number, pageSize: number): $CancellablePromise<$models.SceneDTO[] | null> {
+export function FindScenes(page: number, pageSize: number): $CancellablePromise<$models.ScenesPageDTO | null> {
     return $Call.ByID(3579858290, page, pageSize);
 }
 

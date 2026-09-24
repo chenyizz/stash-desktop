@@ -33,6 +33,29 @@ type SceneDTO struct {
 	UpdatedAt string `json:"updatedAt"`
 }
 
+// ScenesPageDTO 是场景列表的分页结果。
+type ScenesPageDTO struct {
+	Scenes   []SceneDTO `json:"scenes"`
+	Total    int        `json:"total"`
+	Page     int        `json:"page"`
+	PageSize int        `json:"pageSize"`
+}
+
+// normalizePage 约束分页参数，避免非法/过大请求。
+func normalizePage(page, pageSize int) (int, int) {
+	if page < 1 {
+		page = 1
+	}
+	switch {
+	case pageSize < 1:
+		pageSize = 50
+	case pageSize > 200:
+		pageSize = 200
+	}
+
+	return page, pageSize
+}
+
 func New() *App {
 	return &App{}
 }
@@ -167,13 +190,16 @@ func (a *App) ScanLibrary(path string) (int, error) {
 	return jobID, nil
 }
 
-// FindScenes 分页查询场景列表。
-func (a *App) FindScenes(page int, pageSize int) ([]SceneDTO, error) {
+// FindScenes 分页查询场景列表，返回分页结果与总数。
+func (a *App) FindScenes(page int, pageSize int) (*ScenesPageDTO, error) {
 	if a.mgr == nil {
 		return nil, fmt.Errorf("manager 未初始化")
 	}
 
+	page, pageSize = normalizePage(page, pageSize)
+
 	var dtos []SceneDTO
+	total := 0
 
 	err := a.mgr.Repository.WithReadTxn(context.Background(), func(ctx context.Context) error {
 		findFilter := &models.FindFilterType{
@@ -184,11 +210,13 @@ func (a *App) FindScenes(page int, pageSize int) ([]SceneDTO, error) {
 		result, err := a.mgr.Repository.Scene.Query(ctx, models.SceneQueryOptions{
 			QueryOptions: models.QueryOptions{
 				FindFilter: findFilter,
+				Count:      true,
 			},
 		})
 		if err != nil {
 			return err
 		}
+		total = result.Count
 
 		scenes, err := result.Resolve(ctx)
 		if err != nil {
@@ -213,6 +241,12 @@ func (a *App) FindScenes(page int, pageSize int) ([]SceneDTO, error) {
 		return nil, fmt.Errorf("查询场景失败: %w", err)
 	}
 
-	logger.Infof("查询场景: page=%d, pageSize=%d, 返回 %d 条", page, pageSize, len(dtos))
-	return dtos, nil
+	logger.Infof("查询场景: page=%d, pageSize=%d, total=%d, 返回 %d 条", page, pageSize, total, len(dtos))
+
+	return &ScenesPageDTO{
+		Scenes:   dtos,
+		Total:    total,
+		Page:     page,
+		PageSize: pageSize,
+	}, nil
 }

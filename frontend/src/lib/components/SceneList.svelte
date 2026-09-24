@@ -12,6 +12,10 @@
   let scenes: any[] = $state([]);
   let scenesLoading = $state(false);
   let scenesError = $state("");
+  let page = $state(1);
+  let total = $state(0);
+
+  const PAGE_SIZE = 50;
 
   async function doScan() {
     if (!scanPath.trim()) {
@@ -30,15 +34,27 @@
     }
   }
 
-  async function loadScenes() {
+  async function loadScenes(target = page) {
     scenesLoading = true;
     scenesError = "";
     try {
-      scenes = (await App.FindScenes(1, 50)) ?? [];
+      const result = await App.FindScenes(target, PAGE_SIZE);
+      scenes = result?.scenes ?? [];
+      total = result?.total ?? 0;
+      page = result?.page ?? target;
     } catch (e) {
       scenesError = `加载失败: ${e}`;
     } finally {
       scenesLoading = false;
+    }
+  }
+
+  let totalPages = $derived(Math.max(1, Math.ceil(total / PAGE_SIZE)));
+
+  function gotoPage(target: number) {
+    const next = Math.min(Math.max(1, target), totalPages);
+    if (next !== page) {
+      loadScenes(next);
     }
   }
 
@@ -49,12 +65,12 @@
   let offScan: (() => void) | undefined;
 
   onMount(() => {
-    loadScenes();
+    loadScenes(1);
     // 后端扫描/清理完成事件（替代 setTimeout 轮询）
     offScan = Events.On(SCAN_COMPLETE, () => {
       scanning = false;
       scanResult = "✅ 扫描完成，已刷新列表";
-      loadScenes();
+      loadScenes(1);
     });
   });
 
@@ -84,8 +100,8 @@
 
   <div class="scenes-section">
     <div class="header">
-      <h2>场景列表 ({scenes.length})</h2>
-      <button onclick={loadScenes} disabled={scenesLoading}>
+      <h2>场景列表（共 {total}）</h2>
+      <button onclick={() => loadScenes()} disabled={scenesLoading}>
         {scenesLoading ? "加载中..." : "刷新"}
       </button>
     </div>
@@ -121,6 +137,18 @@
         </div>
       {/each}
     </div>
+
+    {#if totalPages > 1}
+      <div class="pager">
+        <button onclick={() => gotoPage(page - 1)} disabled={page <= 1 || scenesLoading}>
+          上一页
+        </button>
+        <span>第 {page} / {totalPages} 页</span>
+        <button onclick={() => gotoPage(page + 1)} disabled={page >= totalPages || scenesLoading}>
+          下一页
+        </button>
+      </div>
+    {/if}
   </div>
 </main>
 
@@ -243,5 +271,18 @@
     font-size: 0.75rem;
     color: #999;
     margin-top: 0.25rem;
+  }
+  .pager {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 1rem;
+    margin-top: 1.5rem;
+    font-size: 0.9rem;
+    color: #555;
+  }
+  .pager button:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
   }
 </style>

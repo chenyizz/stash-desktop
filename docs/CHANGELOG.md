@@ -1,5 +1,28 @@
 # CHANGELOG
 
+## 2026-09-24（阶段 3.2 - 列表分页）
+
+### 新增
+
+- `internal/app/app.go`：`ScenesPageDTO`（`scenes/total/page/pageSize`）+ `normalizePage`（page<1→1，pageSize 1–200，默认 50）
+- `internal/app/pagination_test.go`：`normalizePage` 用例
+
+### 修改
+
+- `internal/app/app.go`：`FindScenes` 签名改为 `(*ScenesPageDTO, error)`，`Count: true` 取总数
+- `frontend/src/lib/components/SceneList.svelte`：新增分页器（上一页/下一页/页码/总数），`FindScenes` 适配新返回
+
+### 修复
+
+- 无
+
+### 验证
+
+- `go build ./...`、`go test ./internal/app/...`：通过
+- bindings 重新生成（`FindScenes` → `ScenesPageDTO`）
+- `npm run check`：0 errors；`npm run build`：通过
+- `wails3 dev`：构建成功、WebView2 启动成功
+
 ## 2026-09-24（阶段 3.1 - 扫描完成事件）
 
 ### 新增

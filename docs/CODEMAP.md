@@ -148,7 +148,7 @@ func DateFromYear(year int) Date
 
 | 文件               | 职责                                                         |
 | ------------------ | ------------------------------------------------------------ |
-| `app.go`           | Wails `ServiceStartup`、`ScanLibrary` / `FindScenes`、`SceneDTO` 定义 |
+| `app.go`           | Wails `ServiceStartup`、`ScanLibrary` / `FindScenes`（分页）、`SceneDTO`/`ScenesPageDTO` 定义 |
 | `scene.go`         | `GetScene` / `SceneDetailDTO` / `TagDTO` / `PerformerDTO` / `SceneFileDTO` |
 | `cover.go`         | `ensureCover`（按需生成）+ `CoverMiddleware`（`/covers/<id>`） |
 | `events.go`        | `watchScanEvents`（扫描完成推送 `scan:complete`）             |
@@ -192,6 +192,7 @@ git diff --name-only HEAD -- backend/manager backend/pkg  # 找冻结区改动
 
 | 日期       | 变更                                                         |
 | ---------- | ------------------------------------------------------------ |
+| 2026-09-24 | 阶段 3.2：`FindScenes` 返回 `ScenesPageDTO`（分页）；`normalizePage` |
 | 2026-09-24 | 阶段 3.1：`internal/app/events.go`（`scan:complete` 事件）+ `frontend/src/lib/events.ts` |
 | 2026-09-23 | 命名清理（阶段 5）：`StashConfig→LibraryConfig`、`stash_config.go→library_config.go`、`stashignore.go→caseignore.go`、`GetStashHomeDirectory→GetCaseHomeDirectory`、`STASH_*`→`CASE_*` |
 | 2026-09-23 | 阶段 2.4.4/2.4.5：详情页 + hash 路由；`metadata/cover/` 策略链 + `internal/app/cover.go` |

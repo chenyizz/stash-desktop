@@ -88,6 +88,16 @@ export interface SceneFileDTO {
 }
 
 /**
+ * ScenesPageDTO 是场景列表的分页结果。
+ */
+export interface ScenesPageDTO {
+    "scenes": SceneDTO[] | null;
+    "total": number;
+    "page": number;
+    "pageSize": number;
+}
+
+/**
  * TagDTO pairs a tag ID with its name so the frontend can look up either
  * without relying on parallel arrays.
  */

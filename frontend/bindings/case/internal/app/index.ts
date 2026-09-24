@@ -11,5 +11,6 @@ export type {
     SceneDTO,
     SceneDetailDTO,
     SceneFileDTO,
+    ScenesPageDTO,
     TagDTO
 } from "./models.js";
