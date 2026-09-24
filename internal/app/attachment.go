@@ -89,6 +89,10 @@ func (a *App) scenePrimaryPath(ctx context.Context, sceneID int) (string, error)
 
 // resolveAttachments 把文件系统附件映射为带索引 URL 的 DTO。
 func (a *App) resolveAttachments(sceneID int, videoPath string) []AttachmentDTO {
+	if !a.mgr.Config.GetLibraryMode(videoPath).Attachments {
+		return nil
+	}
+
 	list := attachments.Resolve(videoPath)
 	if len(list) == 0 {
 		return nil

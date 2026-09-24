@@ -42,6 +42,8 @@ type LibraryMode struct {
 
 **D1-a（已解决）**：模式 C（同时扫视频与图片）= `Videos && Images`，无需「同目录两条配置」。
 
+**实现状态（阶段 3）**：`LibraryMode{Videos,Images,Attachments}` 已落地；`nil` 默认全开；显式 both-false 由 `Validate()` 拒绝；扫描分派与附件开关已接入。
+
 ### D2 附件机制：待决策项，本轮不定稿
 
 附件不采用任何「现在就要欠债」的 hack。三种候选：

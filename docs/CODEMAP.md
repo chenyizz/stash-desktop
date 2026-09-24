@@ -192,7 +192,7 @@ git diff --name-only HEAD -- backend/manager backend/pkg  # 找冻结区改动
 
 | 日期       | 变更                                                         |
 | ---------- | ------------------------------------------------------------ |
-| 2026-09-24 | 阶段 3.7/3.8：缩略图端点/缓存 + 列表海报墙；附件 resolver（方案 A）+ `/attachments` 端点 |
+| 2026-09-24 | 阶段 3.7-3.9：缩略图/海报墙；附件（方案 A）；`LibraryMode` 扫描分派 |
 | 2026-09-24 | 阶段 3.4-3.6：`Pager.svelte`、router 前缀路由 + `NAV_ITEMS`、`taxonomy.go` + `TaxonomyList.svelte` |
 | 2026-09-24 | 阶段 3.1-3.3：`scan:complete`；`ScenesPageDTO`（分页）；`SceneDTO` 加 tags/performers |
 | 2026-09-23 | 命名清理（阶段 5）：`StashConfig→LibraryConfig`、`stash_config.go→library_config.go`、`stashignore.go→caseignore.go`、`GetStashHomeDirectory→GetCaseHomeDirectory`、`STASH_*`→`CASE_*` |

@@ -1,5 +1,29 @@
 # CHANGELOG
 
+## 2026-09-24（阶段 3.9 - LibraryMode 扫描分派）
+
+### 新增
+
+- `backend/manager/config`：`LibraryMode{Videos,Images,Attachments}` + `Effective()`（nil 默认全开）+ `Config.GetLibraryMode(path)`
+- `library_mode_test.go`：Effective / GetLibraryMode / Validate 用例
+
+### 修改
+
+- `config.go`：`Validate()` 对「显式同时关闭 videos 与 images」报错
+- `manager/manager_tasks.go`：`useAsVideo`/`useAsImage` 按库路径 mode 判定
+- `manager/task_scan.go`：`scanFilter.Accept` 按 mode 跳过禁用的媒体类型
+- `internal/app/attachment.go`：附件解析受 `Attachments` 开关控制
+
+### 验证
+
+- `go build ./...`、`go vet ./backend/manager/config/...`：通过
+- `go test ./backend/manager/config/...`、`go test -vet=off ./backend/manager/...`、`go test ./internal/app/... ./backend/pkg/metadata/...`：全部 PASS
+- `wails3 dev`：构建成功、现有 `config.yml`（无 mode）按默认全开正常加载
+
+### 说明
+
+- 库路径 mode 目前仅配置文件（无 UI）；显式 `{videos:false,images:false}` 会被校验拒绝
+
 ## 2026-09-24（阶段 3.8 - 详情页附件，D2 方案 A）
 
 ### 新增

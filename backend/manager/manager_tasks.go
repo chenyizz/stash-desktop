@@ -19,18 +19,26 @@ import (
 )
 
 func useAsVideo(pathname string) bool {
-	lib := config.LibraryConfigs.GetLibraryFromDirPath(instance.Config.GetLibraryPaths(), pathname)
+	cfg := instance.Config
+	lib := config.LibraryConfigs.GetLibraryFromDirPath(cfg.GetLibraryPaths(), pathname)
 
-	if instance.Config.IsCreateImageClipsFromVideos() && lib != nil && lib.ExcludeVideo {
+	if cfg.IsCreateImageClipsFromVideos() && lib != nil && lib.ExcludeVideo {
+		return false
+	}
+	if lib != nil && !lib.Mode.Effective().Videos {
 		return false
 	}
 	return isVideo(pathname)
 }
 
 func useAsImage(pathname string) bool {
-	lib := config.LibraryConfigs.GetLibraryFromDirPath(instance.Config.GetLibraryPaths(), pathname)
-	if instance.Config.IsCreateImageClipsFromVideos() && lib != nil && lib.ExcludeVideo {
+	cfg := instance.Config
+	lib := config.LibraryConfigs.GetLibraryFromDirPath(cfg.GetLibraryPaths(), pathname)
+	if cfg.IsCreateImageClipsFromVideos() && lib != nil && lib.ExcludeVideo {
 		return isImage(pathname) || isVideo(pathname)
+	}
+	if lib != nil && !lib.Mode.Effective().Images {
+		return false
 	}
 	return isImage(pathname)
 }

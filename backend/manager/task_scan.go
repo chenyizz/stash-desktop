@@ -611,6 +611,17 @@ func (f *scanFilter) Accept(ctx context.Context, path string, info fs.FileInfo, 
 	isImageFile := useAsImage(path)
 	isZipFile := fsutil.MatchExtension(path, f.zipExt)
 
+	// 库路径扫描模式：按 mode 跳过禁用的媒体类型
+	mode := s.Mode.Effective()
+	if isVideoFile && !mode.Videos {
+		logger.Debugf("Skipping %s: library mode disables videos", path)
+		return false
+	}
+	if (isImageFile || isZipFile) && !mode.Images {
+		logger.Debugf("Skipping %s: library mode disables images", path)
+		return false
+	}
+
 	if !info.IsDir() && !isVideoFile && !isImageFile && !isZipFile {
 		logger.Debugf("Skipping %s as it does not match any known file extensions", path)
 		return false
