@@ -178,9 +178,9 @@ func enforceThumbnailLimit(dir string) {
 	}
 }
 
-// SweepThumbnails 删除已无对应 blob 的孤立缩略图（覆盖场景删除/封面更新后的回收）。
+// sweepThumbnails 删除已无对应 blob 的孤立缩略图（覆盖场景删除/封面更新后的回收）。
 // 在启动时调用一次；精确的随删随清需要 hook blob 删除（冻结区），见 TECH_DEBT。
-func (a *App) SweepThumbnails(ctx context.Context) {
+func (a *App) sweepThumbnails(ctx context.Context) {
 	dir := a.thumbnailDir()
 	entries, err := os.ReadDir(dir)
 	if err != nil {

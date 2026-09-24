@@ -1,5 +1,28 @@
 # CHANGELOG
 
+## 2026-09-24（阶段 3.7 - 封面缩略图 + 列表海报墙）
+
+### 新增
+
+- `internal/app/thumbnail.go`：`serveThumbnail`（imaging 缩放、磁盘缓存、ETag/304、宽度白名单 {160,320,640}、容量上限 256MB + 启动孤儿清理 `SweepThumbnails`）
+- `internal/app/thumbnail_test.go`：`resizeJPEG` 用例
+
+### 修改
+
+- `internal/app/cover.go`：`CoverMiddleware` 仅按前缀分发；新增 `handleCover`（`?w=` → 缩略图，否则原图）
+- `internal/app/app.go`：启动时触发 `SweepThumbnails`
+- `frontend/src/lib/components/SceneList.svelte`：卡片改为 16/9 海报（`/covers/<id>?w=320`，`loading="lazy"`，失败降级占位）
+
+### 验证
+
+- `go build ./...`、`go vet ./internal/app/...`、`go test ./internal/app/...`：通过
+- `npm run check`：0 errors；`npm run build`：通过；`wails3 dev` 冒烟成功
+
+### 说明
+
+- 缩略图 URL 不带 `?v`；缓存由服务端 ETag（checksum+宽度）控制
+- 技术债：封面比例适配策略待定、精确随删随清需 hook blob 删除（见 TECH_DEBT）
+
 ## 2026-09-24（阶段 3.6 - 演员/标签/工作室列表页）
 
 ### 新增

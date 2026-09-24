@@ -126,6 +126,16 @@
             if (e.key === "Enter" || e.key === " ") openScene(scene.id);
           }}
         >
+          <div class="scene-cover" style={`--hue: ${(scene.id * 47) % 360}`}>
+            <img
+              src={`/covers/${scene.id}?w=320`}
+              alt=""
+              loading="lazy"
+              onerror={(e) => {
+                (e.currentTarget as HTMLImageElement).style.display = "none";
+              }}
+            />
+          </div>
           <div class="scene-title">{scene.title || "(无标题)"}</div>
           <div class="scene-meta">
             {#if scene.organized}
@@ -238,6 +248,20 @@
   .scene-card:focus-visible {
     outline: 2px solid #202b33;
     outline-offset: 2px;
+  }
+  .scene-cover {
+    width: 100%;
+    aspect-ratio: 16 / 9;
+    border-radius: 6px;
+    overflow: hidden;
+    background: hsl(var(--hue), 20%, 15%);
+    margin-bottom: 0.5rem;
+  }
+  .scene-cover img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
   }
   .scene-title {
     font-weight: bold;

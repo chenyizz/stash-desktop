@@ -26,6 +26,7 @@
 - 列表分页：`FindScenes` 返回 `ScenesPageDTO`（`total/page/pageSize`）+ 前端分页器
 - 列表标签/演员：`SceneDTO` 扩展结构化 `tags/performers`（本页批量取名称）+ 前端 chips
 - 演员/标签/工作室列表页：`FindPerformers` / `FindTags` / `FindStudios`（分页）+ 通用 `TaxonomyList` + 顶部导航
+- 封面缩略图 + 列表海报墙：`/covers/<id>?w=320`（imaging 缩放 + 磁盘缓存/ETag），卡片 16/9 海报
 
 ## 当前焦点
 
@@ -33,8 +34,7 @@
 
 ## 下一步
 
-1. 封面缩略图与列表海报墙
-2. 阶段 3 结束前写 `docs/MIGRATIONS.md`（记录当前 schema、每张表作用、停用表、删除顺序）
+1. 阶段 3 结束前写 `docs/MIGRATIONS.md`（记录当前 schema、每张表作用、停用表、删除顺序）
 
 ## 已知问题（阶段 3 相关）
 
@@ -46,8 +46,8 @@
 
 ## 最近变更
 
+- 封面缩略图/海报墙：`internal/app/thumbnail.go`（imaging + 磁盘缓存 + ETag + 启动孤儿清理）；列表卡片 16/9 海报
 - 演员/标签/工作室列表页：`internal/app/taxonomy.go` + `TaxonomyList.svelte`（响应式网格，60/页）+ 导航由 router 导出
-- 前端重构：抽出 `Pager.svelte`；router 泛化为前缀路由并导出 `NAV_ITEMS`
 - 列表分页 + 标签/演员：`FindScenes` 返回 `ScenesPageDTO`；`SceneDTO` 含 `tags`/`performers`（本页批量取名称）
 - 扫描完成事件：`internal/app/events.go`（watcher + 契约 `scan:complete` + `{at}`）替代前端 `setTimeout`
 - 封面收尾：`CoverURL` 缓存参数改用 `md5(bytes)[:8]`（`UpdateCover` 不改 `updated_at`）；解码失败置空走占位
